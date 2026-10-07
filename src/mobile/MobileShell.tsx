@@ -1,14 +1,15 @@
 import type { ReactNode } from 'react';
-import { LayoutDashboard, Users, Package, ShoppingCart } from 'lucide-react';
+import { LayoutDashboard, Users, Package, ShoppingCart, Factory } from 'lucide-react';
 import { cn } from '../lib/utils';
 
-export type MobileTab = 'summary' | 'contacts' | 'inventory' | 'orders';
+export type MobileTab = 'summary' | 'contacts' | 'inventory' | 'orders' | 'production';
 
 const TABS: { key: MobileTab; label: string; icon: typeof LayoutDashboard }[] = [
   { key: 'summary', label: 'Özet', icon: LayoutDashboard },
   { key: 'contacts', label: 'Cari', icon: Users },
   { key: 'inventory', label: 'Stok', icon: Package },
   { key: 'orders', label: 'Sipariş', icon: ShoppingCart },
+  { key: 'production', label: 'Üretim', icon: Factory },
 ];
 
 interface Props {
@@ -33,7 +34,7 @@ export default function MobileShell({ title, active, onTab, right, children }: P
 
       <main className="flex-1 px-3 pt-3 pb-24 space-y-3">{children}</main>
 
-      <nav className="fixed bottom-0 inset-x-0 z-20 grid grid-cols-4 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 pb-[env(safe-area-inset-bottom)]">
+      <nav className="fixed bottom-0 inset-x-0 z-20 grid grid-cols-5 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 pb-[env(safe-area-inset-bottom)]">
         {TABS.map(({ key, label, icon: Icon }) => {
           const isActive = key === active;
           return (

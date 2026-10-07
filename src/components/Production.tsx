@@ -34,7 +34,9 @@ import {
   Camera,
   Copy,
   Truck,
-  Factory
+  Factory,
+  LayoutGrid,
+  Table2
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cn } from '../lib/utils';
@@ -81,6 +83,13 @@ export default function Production() {
   const [activeTab, setActiveTab] = React.useState<ProductionTab>('pipeline');
   const [searchTerm, setSearchTerm] = React.useState('');
   const [stageFilter, setStageFilter] = React.useState<string>('all');
+  const [pipelineView, setPipelineView] = React.useState<'cards' | 'grid'>(() =>
+    (localStorage.getItem('proerp-production-view') as 'cards' | 'grid') || 'cards'
+  );
+  const changePipelineView = (v: 'cards' | 'grid') => {
+    setPipelineView(v);
+    localStorage.setItem('proerp-production-view', v);
+  };
   const [selectedWorkOrder, setSelectedWorkOrder] = React.useState<WorkOrder | null>(null);
 
   // Modals
@@ -414,6 +423,58 @@ export default function Production() {
     }
   };
 
+  // Pipeline grid (tablo) görünümü kolonları
+  const woColumns = React.useMemo<GridColumn<WorkOrder>[]>(() => [
+    { key: 'barcode', title: 'İş Emri', width: '110px' },
+    {
+      key: 'product', title: 'Model',
+      render: (wo) => {
+        const p = productMap.get(wo.productId);
+        return (
+          <div className="min-w-0">
+            <div className="text-xs font-bold truncate">{p?.name || '-'}</div>
+            <div className="text-[10px] text-slate-400 truncate">{p?.code || ''}</div>
+          </div>
+        );
+      },
+      filterValue: (wo) => `${productMap.get(wo.productId)?.name || ''} ${productMap.get(wo.productId)?.code || ''}`,
+      sortValue: (wo) => productMap.get(wo.productId)?.name || '',
+    },
+    {
+      key: 'variant', title: 'Renk / Beden',
+      render: (wo) => <span className="text-xs">{[wo.color, wo.size].filter(Boolean).join(' / ') || '-'}</span>,
+      filterValue: (wo) => `${wo.color || ''} ${wo.size || ''}`,
+    },
+    { key: 'quantity', title: 'Miktar', align: 'right', width: '80px', render: (wo) => <span className="text-xs font-bold tabular-nums">{wo.quantity}</span> },
+    { key: 'orderNumber', title: 'Sipariş', render: (wo) => <span className="text-xs">{wo.orderNumber || '-'}</span> },
+    { key: 'customerName', title: 'Cari', render: (wo) => <span className="text-xs truncate">{wo.customerName || '-'}</span> },
+    {
+      key: 'currentStage', title: 'Aşama',
+      render: (wo) => <StatusPill tone="blue" className="text-[10px] uppercase">{getStageInfo(wo.currentStage).shortLabel}</StatusPill>,
+      sortValue: (wo) => wo.currentStage,
+      filterValue: (wo) => getStageInfo(wo.currentStage).label,
+    },
+    {
+      key: 'status', title: 'Durum',
+      render: (wo) => (
+        <StatusPill tone={wo.status === 'completed' ? 'green' : wo.status === 'cancelled' ? 'red' : wo.status === 'in_progress' ? 'amber' : 'slate'} className="text-[10px] uppercase">
+          {wo.status === 'completed' ? 'Tamamlandı' : wo.status === 'cancelled' ? 'İptal' : wo.status === 'in_progress' ? 'Sürüyor' : 'Bekliyor'}
+        </StatusPill>
+      ),
+      filterValue: (wo) => wo.status,
+    },
+    {
+      key: 'materialStatus', title: 'Malzeme',
+      render: (wo) => renderMaterialStatusBadge(wo.materialStatus, wo.productId),
+      filterValue: (wo) => wo.materialStatus || '',
+    },
+    {
+      key: 'targetDate', title: 'Termin', width: '100px',
+      render: (wo) => <span className="text-xs tabular-nums">{wo.targetDate ? new Date(wo.targetDate).toLocaleDateString('tr-TR') : '-'}</span>,
+      sortValue: (wo) => (wo.targetDate ? new Date(wo.targetDate).getTime() : 0),
+    },
+  ], [productMap]);
+
   return (
     <div className="space-y-6">
       {/* Top Header */}
@@ -664,6 +725,36 @@ export default function Production() {
                 <option key={st.id} value={st.id}>{st.label}</option>
               ))}
             </select>
+            <div className="flex items-center rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden shrink-0">
+              <button
+                type="button"
+                onClick={() => changePipelineView('cards')}
+                title="Kart görünümü"
+                aria-label="Kart görünümü"
+                className={cn(
+                  'px-2.5 py-1.5 transition-colors',
+                  pipelineView === 'cards'
+                    ? 'bg-indigo-600 text-white'
+                    : 'bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+                )}
+              >
+                <LayoutGrid className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => changePipelineView('grid')}
+                title="Grid (tablo) görünümü"
+                aria-label="Grid görünümü"
+                className={cn(
+                  'px-2.5 py-1.5 transition-colors',
+                  pipelineView === 'grid'
+                    ? 'bg-indigo-600 text-white'
+                    : 'bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+                )}
+              >
+                <Table2 className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         )}
       </div>
@@ -704,7 +795,20 @@ export default function Production() {
             })}
           </div>
 
+          {/* Work Order Grid (tablo) görünümü */}
+          {pipelineView === 'grid' && (
+            <DataGrid<WorkOrder>
+              columns={woColumns}
+              data={filteredWorkOrders}
+              rowKey="id"
+              density="compact"
+              onRowClick={(wo) => openDetailedWorkOrderSheet(wo)}
+              emptyMessage="Seçili filtreye uygun aktif iş emri yok."
+            />
+          )}
+
           {/* Work Order Cards Grid */}
+          {pipelineView === 'cards' && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {filteredWorkOrders.length === 0 ? (
               <div className="col-span-full bg-white dark:bg-slate-900 rounded-3xl p-16 border border-slate-200 dark:border-slate-700 text-center space-y-3">
@@ -873,6 +977,7 @@ export default function Production() {
               })
             )}
           </div>
+          )}
         </div>
       )}
 

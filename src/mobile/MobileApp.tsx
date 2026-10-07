@@ -6,12 +6,14 @@ import MobileDashboard from './MobileDashboard';
 import MobileContacts from './MobileContacts';
 import MobileInventory from './MobileInventory';
 import MobileOrders from './MobileOrders';
+import MobileProduction from './MobileProduction';
 
 const TITLES: Record<MobileTab, string> = {
   summary: 'ProERP Özet',
   contacts: 'Cari Hesaplar',
   inventory: 'Stok Durumu',
   orders: 'Siparişler',
+  production: 'Üretim Planlama',
 };
 
 /**
@@ -43,6 +45,7 @@ export default function MobileApp() {
       {tab === 'contacts' && <MobileContacts />}
       {tab === 'inventory' && <MobileInventory />}
       {tab === 'orders' && <MobileOrders />}
+      {tab === 'production' && <MobileProduction />}
     </MobileShell>
   );
 }
