@@ -26,6 +26,8 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { FeedbackHost } from './lib/feedback';
 import LoginScreen from './components/Common/LoginScreen';
+import { useIsMobile } from './hooks/useIsMobile';
+import MobileApp from './mobile/MobileApp';
 
 /**
  * Oturum yoksa giriş ekranını gösterir. Yetkilendirme sunucuda yapıldığı için
@@ -56,7 +58,23 @@ export default function App() {
       <AuthProvider>
         <FeedbackHost />
         <AuthGate>
-        <BrowserRouter>
+        <RootSwitch />
+        </AuthGate>
+    </AuthProvider>
+    </ThemeProvider>
+  );
+}
+
+/** Dar ekranda mobil kabuk, aksi halde masaüstü yönlendirme tablosu. */
+function RootSwitch() {
+  const isMobile = useIsMobile();
+  if (isMobile) return <MobileApp />;
+  return <DesktopRoutes />;
+}
+
+function DesktopRoutes() {
+  return (
+    <BrowserRouter>
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Dashboard />} />
@@ -84,8 +102,5 @@ export default function App() {
           </Route>
         </Routes>
       </BrowserRouter>
-        </AuthGate>
-    </AuthProvider>
-    </ThemeProvider>
   );
 }

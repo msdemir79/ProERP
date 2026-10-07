@@ -120,7 +120,7 @@ export default function Layout() {
   const isCurrentModuleAllowed = hasPermission(currentModule, 'view');
 
   return (
-    <div className="flex h-screen bg-slate-100 dark:bg-slate-800/70 dark:bg-slate-950 overflow-hidden font-sans transition-colors duration-200">
+    <div className="flex h-screen pt-[env(safe-area-inset-top)] bg-slate-100 dark:bg-slate-800/70 dark:bg-slate-950 overflow-hidden font-sans transition-colors duration-200">
       {/* Sidebar Desktop */}
       <aside className={cn(
         "hidden md:flex md:flex-col bg-slate-950 border-r border-slate-800/80 shrink-0 transition-all duration-300 ease-in-out relative z-20 shadow-2xl",
