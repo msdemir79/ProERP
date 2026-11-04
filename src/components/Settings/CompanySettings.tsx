@@ -35,14 +35,14 @@ export default function CompanySettings({ settings, onSave }: CompanySettingsPro
   // Yedekleme/geri yükleme ve sıfırlama işlemleri yıkıcıdır: yalnızca Süper Admin.
   const { isSuperAdmin } = useAuth();
   const [comp, setComp] = useState<CompanySettingsType>(settings.company || {
-    companyName: 'ProERP Ayakkabı San. ve Tic. Ltd. Şti.',
-    companyTitle: 'ProERP Ayakkabı İmalat Sanayi ve Ticaret Limited Şirketi',
+    companyName: 'DMR Nexus',
+    companyTitle: 'DMR Nexus',
     taxOffice: 'Güngören Vergi Dairesi',
     taxNumber: '7340981245',
     tradeRegistryNo: '458921-5',
     phone: '+90 212 555 44 33',
-    email: 'info@proerp-shoes.com',
-    website: 'https://proerp-shoes.com',
+    email: '',
+    website: '',
     address: 'Sanayi Cad. Ayakkabıcılar Sanayi Sitesi No: 42 Kat: 3 Güngören',
     city: 'İstanbul / TÜRKİYE',
     bankName: 'Garanti BBVA - Merter Kurumsal',
@@ -179,7 +179,7 @@ export default function CompanySettings({ settings, onSave }: CompanySettingsPro
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `ProERP_Backup_${new Date().toISOString().slice(0, 10)}.json`;
+      a.download = `DMR Nexus_Backup_${new Date().toISOString().slice(0, 10)}.json`;
       a.click();
       URL.revokeObjectURL(url);
     } catch (err) {

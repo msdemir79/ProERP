@@ -1,5 +1,5 @@
 /**
- * ProERP Çekirdek İş Mantığı Birim Testleri
+ * DMR Nexus Çekirdek İş Mantığı Birim Testleri
  * 
  * 1. Bordro & Vergi Matrahı Testleri (2026 Standartları, Kuruş Duyarlılığı)
  * 2. Yevmiye & TDHP Denge Testleri
@@ -66,7 +66,7 @@ function expect(actual: any) {
 }
 
 console.log('\n======================================================');
-console.log(' PROERP BİRİM TESTLERİ ÇALIŞTIRILIYOR (UNIT TESTS)');
+console.log(' DMR NEXUS BİRİM TESTLERİ ÇALIŞTIRILIYOR (UNIT TESTS)');
 console.log('======================================================\n');
 
 // -----------------------------------------------------------------

@@ -182,5 +182,15 @@ try {
     assert.equal((await send('accounting-period', { month: 3, year: 2026 })).status, 200);
     assert.equal((await send('set-accounting-period', { month: 3, year: 2026, isLocked: true, expectedVersion: 3, reason: 'Yetkisiz kapama' })).status, 403);
   });
+  await test('200 satırı aşan toplu değişiklikte her cari için denetim izi oluşur', async () => {
+    const rows = Array.from({ length: 205 }, (_, index) => `('TEST-AUDIT-${index}','customer','TRY')`).join(',');
+    await execute(`INSERT INTO contacts (name,type,currency) VALUES ${rows}`);
+    const result = await request('/ops/commit', {
+      mutations: [{ op: 'updateWhere', resource: 'contacts', where: { name: { op: 'startsWith', value: 'TEST-AUDIT-' } }, data: { city: 'İzmir' } }],
+    });
+    assert.equal(result.status, 200, JSON.stringify(result.body));
+    assert.equal(Number((await queryOne<any>("SELECT COUNT(*) AS n FROM contacts WHERE name LIKE 'TEST-AUDIT-%' AND city='İzmir'"))!.n), 205);
+    assert.equal(Number((await queryOne<any>("SELECT COUNT(*) AS n FROM auditLogs a JOIN contacts c ON a.entityId=CAST(c.id AS CHAR) WHERE c.name LIKE 'TEST-AUDIT-%' AND a.action='update' AND a.module='contacts'"))!.n), 205);
+  });
   console.log(`${passed} işlem bütünlüğü testi başarılı.`);
 } finally { await server.close(); await closePool(); }

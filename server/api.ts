@@ -1147,19 +1147,14 @@ export function createApiRouter(): Router {
                 const data = pickColumns(m.resource, def, m.data || {}, { partial: true });
                 applyResourceRules(m.resource, data);
                 if (m.resource === 'users') await deriveUserRole(conn, data, { auth: req.auth });
-                // Filtreyle güncellenen satırlar önceden okunur: denetim farkı (eski → yeni)
-                // yalnızca anlık görüntüyle hesaplanabilir.
+                // Kilitlenen satırlar hem dönem doğrulaması hem de denetim farkı
+                // için aynı anlık görüntüdür. Ayrı ve LIMIT'li okuma 200'den fazla
+                // satır güncellendiğinde denetim izini eksik bırakıyordu.
                 let beforeRows: any[] = [];
-                if (!disableFkChecks && AUDITED_RESOURCES[m.resource]) {
-                  const [snapshot] = await conn.query(
-                    `SELECT * FROM \`${def.table}\` ${where.sql} LIMIT 200`,
-                    where.params,
-                  );
-                  beforeRows = (snapshot as any[]) || [];
-                }
                 if (!disableFkChecks) {
                   const [periodRows] = await conn.query<any[]>(`SELECT * FROM \`${def.table}\` ${where.sql} FOR UPDATE`, where.params);
                   for (const periodRow of periodRows) await assertResourcePeriod(conn, m.resource, data, periodRow[def.primaryKey], req.auth);
+                  if (AUDITED_RESOURCES[m.resource]) beforeRows = periodRows;
                 }
                 const { sql, params } = updateSql(def, data, where.sql, await supportsVersion(def));
                 const [r] = await conn.query(sql, [...params, ...where.params]);

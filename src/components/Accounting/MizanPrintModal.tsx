@@ -112,7 +112,7 @@ export default function MizanPrintModal({ isOpen, onClose, mizanRows, options }:
     try {
       const html = printContentRef.current.innerHTML;
       await printHtml(html, {
-        title: `ProERP_Mizan_Raporu_${new Date().toISOString().slice(0, 10)}`,
+        title: `DMR Nexus_Mizan_Raporu_${new Date().toISOString().slice(0, 10)}`,
         css: getPrintCss(),
         landscape: orientation === 'landscape'
       });
@@ -124,7 +124,7 @@ export default function MizanPrintModal({ isOpen, onClose, mizanRows, options }:
   const handleOpenNewTab = () => {
     if (!printContentRef.current) return;
     const html = printContentRef.current.innerHTML;
-    openPrintWindow(html, `ProERP Mizan Raporu`, {
+    openPrintWindow(html, `DMR Nexus Mizan Raporu`, {
       css: getPrintCss(),
       landscape: orientation === 'landscape'
     });
@@ -242,7 +242,7 @@ export default function MizanPrintModal({ isOpen, onClose, mizanRows, options }:
                       T.C. MALİYE MEVZUATINA VE V.U.K.'A UYGUN RESMİ BELGE
                     </div>
                     <h1 className="text-base sm:text-lg font-black text-slate-950 uppercase tracking-tight mt-0.5">
-                      {companySettings?.companyTitle || companySettings?.companyName || 'PRO ERP AYAKKABI VE DERİ MAMULLERİ SAN. TİC. LTD. ŞTİ.'}
+                      {companySettings?.companyTitle || companySettings?.companyName || 'DMR Nexus'}
                     </h1>
                     <p className="text-[11px] text-slate-600 font-medium">
                       {companySettings?.address || 'İkitelli OSB Mah. Aykosan Sanayi Sitesi 4. Ada A Blok No: 12-14 Başakşehir / İSTANBUL'}
@@ -351,7 +351,7 @@ export default function MizanPrintModal({ isOpen, onClose, mizanRows, options }:
                         codePadding = "pl-4";
                         namePadding = "pl-6";
                       } else if (isMuavin) {
-                        rowClass = "bg-slate-50 dark:bg-slate-800/50/50 text-slate-800 dark:text-slate-200";
+                        rowClass = "bg-slate-50 dark:bg-slate-800/50 text-slate-800 dark:text-slate-200";
                         codePadding = "pl-6";
                         namePadding = "pl-8";
                       }
@@ -405,21 +405,21 @@ export default function MizanPrintModal({ isOpen, onClose, mizanRows, options }:
 
             {/* 4. İMZA VE ONAY ALANLARI */}
             <div className="mt-8 pt-4 border-t-2 border-slate-300 grid grid-cols-3 gap-6 text-center text-xs">
-              <div className="p-3 border border-slate-300 rounded bg-slate-50 dark:bg-slate-800/50/50">
+              <div className="p-3 border border-slate-300 rounded bg-slate-50 dark:bg-slate-800/50">
                 <div className="font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wide">DÜZENLEYEN</div>
                 <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Muhasebe Yetkilisi</div>
                 <div className="h-14 mt-2 border-b border-dashed border-slate-400"></div>
                 <div className="text-[10px] text-slate-400 mt-1">İmza / Kaşe</div>
               </div>
 
-              <div className="p-3 border border-slate-300 rounded bg-slate-50 dark:bg-slate-800/50/50">
+              <div className="p-3 border border-slate-300 rounded bg-slate-50 dark:bg-slate-800/50">
                 <div className="font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wide">KONTROL EDEN</div>
                 <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Mali Müşavir / SMMM</div>
                 <div className="h-14 mt-2 border-b border-dashed border-slate-400"></div>
                 <div className="text-[10px] text-slate-400 mt-1">İmza / Kaşe</div>
               </div>
 
-              <div className="p-3 border border-slate-300 rounded bg-slate-50 dark:bg-slate-800/50/50">
+              <div className="p-3 border border-slate-300 rounded bg-slate-50 dark:bg-slate-800/50">
                 <div className="font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wide">ONAYLAYAN</div>
                 <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Şirket Müdürü / Yönetim</div>
                 <div className="h-14 mt-2 border-b border-dashed border-slate-400"></div>
@@ -429,7 +429,7 @@ export default function MizanPrintModal({ isOpen, onClose, mizanRows, options }:
 
             {/* 5. DİPNOT */}
             <div className="mt-4 text-[9px] text-slate-500 dark:text-slate-400 flex justify-between items-center border-t border-slate-200 dark:border-slate-700 pt-2">
-              <span>ProERP Entegre Muhasebe ve Üretim Sistemi &bull; Tek Düzen Hesap Planı Resmi Mizan Çıktısı</span>
+              <span>DMR Nexus Entegre Muhasebe ve Üretim Sistemi &bull; Tek Düzen Hesap Planı Resmi Mizan Çıktısı</span>
               <span>213 Sayılı V.U.K. Standartlarına Uygundur</span>
             </div>
           </div>

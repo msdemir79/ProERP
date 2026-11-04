@@ -1,4 +1,4 @@
--- ProERP veritabanı şeması
+-- DMR Nexus veritabanı şeması
 -- MySQL 8.4+ / InnoDB / utf8mb4 (Türkçe sıralama: utf8mb4_turkish_ci)
 --
 -- Tasarım: Skaler ve indekslenen alanlar normal kolon; iç içe diziler
@@ -1353,4 +1353,20 @@ CREATE TABLE IF NOT EXISTS purchaseRequests (
   KEY `idx_purchase_requests_status` (`status`),
   CONSTRAINT `fk_purchase_request_supplier` FOREIGN KEY (`supplierId`) REFERENCES contacts (`id`) ON DELETE RESTRICT,
   CONSTRAINT `fk_purchase_request_order` FOREIGN KEY (`orderId`) REFERENCES orders (`id`) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_turkish_ci;
+CREATE TABLE IF NOT EXISTS stockCounts (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `countNumber` VARCHAR(50) NOT NULL,
+  `items` JSON NOT NULL,
+  `status` ENUM('pending','approved','rejected') NOT NULL DEFAULT 'pending',
+  `notes` TEXT NOT NULL,
+  `decisionReason` TEXT NULL,
+  `createdBy` BIGINT UNSIGNED NOT NULL,
+  `decidedBy` BIGINT UNSIGNED NULL,
+  `createdAt` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `decidedAt` DATETIME NULL,
+  `version` INT NOT NULL DEFAULT 1,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_stock_count_number` (`countNumber`),
+  KEY `idx_stock_count_status` (`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_turkish_ci;

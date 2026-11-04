@@ -1,4 +1,4 @@
-// ProERP veritabanı kurulumu.
+// DMR Nexus veritabanı kurulumu.
 //
 // Kullanım:
 //   npm run db:setup                              (root şifresini sorar)

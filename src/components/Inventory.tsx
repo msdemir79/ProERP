@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { api } from '../api/client';
 import { useApiQuery, useApiQueryFull } from '../hooks/useApiQuery';
 import {
@@ -23,7 +23,7 @@ import {
   Grid,
   Wallet
 } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { cn } from '../lib/utils';
 import { formatQuantity } from '../lib/inventoryCalculator';
 import { getCartonSize } from '../lib/carton';
@@ -51,6 +51,8 @@ import { StockCategoryType, Product } from '../types';
 
 export default function Inventory() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const requestedProductId = searchParams.get('productId');
   const productsQuery = useApiQueryFull(() => api.products.list(), [], ['products']);
   const products = productsQuery.data;
   const templates = useApiQuery(() => api.assortmentTemplates.list(), [], ['assortmentTemplates']);
@@ -77,6 +79,27 @@ export default function Inventory() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   // DMR Kinetiq: satıra tıklanınca açılan sağdan kayan okunur özet paneli.
   const [detailProduct, setDetailProduct] = useState<Product | null>(null);
+
+  useEffect(() => {
+    const id = Number(requestedProductId);
+    if (!requestedProductId || !Number.isSafeInteger(id) || id <= 0) return;
+    let active = true;
+    api.products.get(id)
+      .then(product => { if (active && product) setDetailProduct(product); })
+      .catch(() => { /* Liste ekranındaki hata durumu mevcut sorgu tarafından gösterilir. */ });
+    return () => { active = false; };
+  }, [requestedProductId]);
+
+  const closeDetailProduct = () => {
+    setDetailProduct(null);
+    if (requestedProductId) {
+      setSearchParams(current => {
+        const next = new URLSearchParams(current);
+        next.delete('productId');
+        return next;
+      }, { replace: true });
+    }
+  };
 
   // Live Camera Barcode / QR Scanner State
   const [isCameraScannerOpen, setIsCameraScannerOpen] = useState(false);
@@ -604,7 +627,7 @@ export default function Inventory() {
       {/* ========================================================================= */}
       <DetailPanel
         isOpen={!!detailProduct}
-        onClose={() => setDetailProduct(null)}
+        onClose={closeDetailProduct}
         title={detailProduct?.name || 'Stok Detayı'}
         widthClass="max-w-[460px]"
         badge={

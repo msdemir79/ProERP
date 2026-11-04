@@ -1,5 +1,5 @@
 /**
- * Universal Export Service for ProERP
+ * Universal Export Service for DMR Nexus
  * Supports CSV and rich styled Microsoft Excel (.xls) spreadsheets with UTF-8 BOM.
  */
 
@@ -447,7 +447,7 @@ export function exportPayrollToExcel(
   }
 ) {
   const monthName = MONTH_NAMES[month - 1] || `${month}. Ay`;
-  const companyName = options?.companyName || 'PROERP AYAKKABI & TEKSTİL SAN. TİC. LTD. ŞTİ.';
+  const companyName = options?.companyName || 'DMR Nexus';
   const filterTitle = options?.filterTitle || 'Tüm Personeller (SGK\'lı & Yevmiyeli)';
   const exportDateStr = new Date().toLocaleString('tr-TR', {
     day: '2-digit',

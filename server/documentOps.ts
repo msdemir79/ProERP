@@ -17,6 +17,7 @@ import { calculateEmployeePayroll } from '../src/lib/employeePayroll.js';
 import { HR_DEFAULT_PARAMS } from '../src/lib/hrDefaults.js';
 import { HR_CONSTANTS_2026 } from '../src/lib/payrollCalculator.js';
 import { registerAccountingPeriods } from './accountingPeriods.js';
+import { registerStockCounts } from './stockCounts.js';
 import type { Employee, AttendanceRecord, AdvanceRequest } from '../src/types.js';
 
 type Row = Record<string, any>;
@@ -118,6 +119,7 @@ async function orderWorkOrders(conn: PoolConnection, order: Row): Promise<number
 
 export function registerDocumentOps(router: Router, stock: StockWriter) {
   registerAccountingPeriods(router);
+  registerStockCounts(router);
   router.post('/generate-payroll', async (req, res, next) => {
     try {
       permission(req, 'hr', 'create');
@@ -204,11 +206,15 @@ export function registerDocumentOps(router: Router, stock: StockWriter) {
         const quantity = Number(req.body.quantity);
         if (!Number.isFinite(quantity) || quantity <= 0 || (quantityDecimals(product.unit) === 0 && !Number.isInteger(quantity))) throw new HttpError(400, 'Geçersiz rezervasyon miktarı.');
         if (!req.body.orderId && !req.body.workOrderId) throw new HttpError(400, 'Rezervasyon sipariş veya iş emrine bağlanmalıdır.');
+        if (req.body.orderId && req.body.workOrderId) throw new HttpError(400, 'Rezervasyonu yalnız bir sipariş veya iş emrine bağlayın.');
         if (req.body.orderId) {
           const order = await one(conn, 'orders', req.body.orderId);
           if (order.type !== 'sales' || !['confirmed', 'partially_shipped'].includes(order.status)) throw new HttpError(409, 'Rezervasyon için aktif satış siparişi seçin.');
           const match = await rows(conn, 'SELECT `id` FROM `orderItems` WHERE `orderId`=? AND `productId`=? AND COALESCE(`color`,\'\')=? AND COALESCE(`size`,\'\')=?', [order.id, product.id, req.body.color || '', req.body.size || '']);
           if (!match.length) throw new HttpError(400, 'Ürün/renk/beden siparişte bulunmuyor.');
+          const outstanding = (await rows(conn, "SELECT COALESCE(SUM(quantity-shippedQuantity),0) n FROM orderItems WHERE orderId=? AND productId=? AND COALESCE(color,'')=? AND COALESCE(size,'')=?", [order.id, product.id, req.body.color || '', req.body.size || '']))[0];
+          const held = (await rows(conn, "SELECT COALESCE(SUM(remainingQuantity),0) n FROM stockReservations WHERE orderId=? AND productId=? AND status='active' AND COALESCE(color,'')=? AND COALESCE(size,'')=?", [order.id, product.id, req.body.color || '', req.body.size || '']))[0];
+          if (quantity + Number(held.n) > Number(outstanding.n) + 0.00001) throw new HttpError(409, 'Rezervasyon siparişin kalan ihtiyacını aşamaz.');
         }
         if (req.body.workOrderId) {
           const workOrder = await one(conn, 'workOrders', req.body.workOrderId);
@@ -417,6 +423,10 @@ export function registerDocumentOps(router: Router, stock: StockWriter) {
       const input = req.body?.waybill || {};
       const result = await withOperation(req, async conn => {
         const date = dateOf(input.date);
+        const dispatchDate = input.dispatchDate == null || input.dispatchDate === '' ? null : new Date(input.dispatchDate);
+        if (dispatchDate && !Number.isFinite(dispatchDate.getTime())) throw new HttpError(400, 'Geçersiz sevk tarihi.');
+        const shippingDate = input.shippingDate == null || input.shippingDate === '' ? null : new Date(input.shippingDate);
+        if (shippingDate && !Number.isFinite(shippingDate.getTime())) throw new HttpError(400, 'Geçersiz gönderim tarihi.');
         await assertOpenPeriod(conn, 'accounting', date);
         if (!['sales', 'purchase'].includes(input.type) || !['draft', 'issued'].includes(input.status)) throw new HttpError(400, 'İrsaliye tipi veya durumu geçersiz.');
         if ((input.currency || 'TRY') !== 'TRY') throw new HttpError(400, 'Dövizli irsaliye etkin değil.');
@@ -424,7 +434,7 @@ export function registerDocumentOps(router: Router, stock: StockWriter) {
         const cfg = await settings(conn);
         const items = await normalizeItems(conn, req.body.items);
         const waybillNumber = await documentNumber(conn, 'waybills', input.type === 'sales' ? cfg.order?.waybillSalesPrefix || 'IRS' : cfg.order?.waybillPurchasePrefix || 'GIR', date);
-        const data = { ...input, contactId: contact.id, contactName: contact.name, date, waybillNumber,
+        const data = { ...input, contactId: contact.id, contactName: contact.name, date, shippingDate, dispatchDate, waybillNumber,
           orderId: input.orderId || null, invoiceId: null, invoiceNumber: null, invoicedStatus: 'not_invoiced',
           subtotal: money(items.reduce((sum, item) => sum + item.subtotal, 0)), discountTotal: money(items.reduce((sum, item) => sum + item.discountAmount, 0)),
           taxTotal: money(items.reduce((sum, item) => sum + item.taxAmount, 0)), grandTotal: money(items.reduce((sum, item) => sum + item.total, 0)), totalQuantity: items.reduce((sum, item) => sum + item.quantity, 0),

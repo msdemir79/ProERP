@@ -118,7 +118,7 @@ export function LedgerTab({ filteredLedger, totalDebit, totalCredit, netBalance 
                 </tr>
               ) : (
                 filteredLedger.map((row) => (
-                  <tr key={row.id} className="hover:bg-slate-50 dark:bg-slate-800/50/80 transition-colors">
+                  <tr key={row.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/80 transition-colors">
                     <td className="px-4 py-3 font-mono font-medium text-slate-600 whitespace-nowrap">
                       {row.date.toLocaleDateString('tr-TR')}
                     </td>

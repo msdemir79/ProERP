@@ -1,4 +1,4 @@
-# ProERP — Derinlemesine analiz ve ERP gelişim raporu
+# DMR Nexus — Derinlemesine analiz ve ERP gelişim raporu
 
 **Tarih:** 15 Ekim 2026  
 **İncelenen proje:** `E:\ProERP`  
@@ -7,7 +7,7 @@
 
 ## 1. Yönetici değerlendirmesi
 
-ProERP; stok, renk/beden, asorti, reçete, iş emri, kalıp, sipariş, irsaliye, fatura, cari, kasa/banka, muhasebe ve İK kapsamıyla anlamlı bir sektörel ERP temeline sahip. Özellikle kalıp hareketleri, beden matrisi, barkod terminali ve reçete sarfiyatı sektör açısından değerli.
+DMR Nexus; stok, renk/beden, asorti, reçete, iş emri, kalıp, sipariş, irsaliye, fatura, cari, kasa/banka, muhasebe ve İK kapsamıyla anlamlı bir sektörel ERP temeline sahip. Özellikle kalıp hareketleri, beden matrisi, barkod terminali ve reçete sarfiyatı sektör açısından değerli.
 
 En büyük gelişim ihtiyacı yeni ekran sayısını artırmak değil, **mevcut iş süreçlerini uçtan uca güvenilir hale getirmek**. Bazı finans uçlarında sunucu transaction'ları ve kilitleri iyi uygulanmışken, sipariş/irsaliye/üretim geçişlerinde süreçler hâlâ istemcinin yönettiği ayrı isteklere bölünüyor. Bu iki yaklaşımın bir arada bulunması tutarsızlık riski oluşturuyor.
 
@@ -214,11 +214,11 @@ Toplam 5 olsa bile negatif beden miktarı geçersiz. Ortak `distributeWithLarges
 
 **Öneri:** İş tarihine göre azalan sıralama ve eşitlikte `id DESC`; gerekiyorsa satış filtresi. Dashboard'da her göstergenin tarih aralığı, dövizi ve hesaplama tanımı görünür olmalı. Sıfır değer, yetkisizlik ve veri yükleme hatası birbirinden ayrılmalı.
 
-## 5. Bir ERP'de beklenen kapsam ve ProERP karşılığı
+## 5. Bir ERP'de beklenen kapsam ve DMR Nexus karşılığı
 
 Her işletmede bütün ERP modülleri zorunlu değildir. “Çekirdek” küçük üretim işletmesinde temel ihtiyaç; “üretim önceliği” ayakkabı fabrikasında yüksek değer; “büyüme” ise iş hacmine/organizasyona bağlıdır.
 
-| Yetkinlik | Beklenti | ProERP'deki durum | Önerilen tamamlama |
+| Yetkinlik | Beklenti | DMR Nexus'taki durum | Önerilen tamamlama |
 |---|---|---|---|
 | Ana veri | Çekirdek | Ürün/cari/personel/renk var | Benzersizlik, birim kuralları, pasifleştirme, veri kalite paneli |
 | Satış siparişi | Çekirdek | Var; beden/asorti destekli | Sunucu toplamları, rezervasyon, iskonto/risk limiti ve onay |

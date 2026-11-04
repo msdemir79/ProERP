@@ -213,7 +213,8 @@ export default function MrpPurchaseOrderModal({
         isOpen={true} 
         onClose={onClose}
         title="MRP'den Tedarikçiye Göre Ayrıştırılmış Satın Alma Siparişleri"
-        className="max-w-3xl sm:max-w-4xl"
+        edgeToEdge
+        allowFullscreen={false}
       >
         {poCreatedSummary ? (
           <div className="space-y-6 py-2">
@@ -233,7 +234,7 @@ export default function MrpPurchaseOrderModal({
               <div className="text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider">
                 Oluşturulan Sipariş Fişleri ({poCreatedSummary.totalOrders})
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-64 overflow-y-auto pr-1">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[60dvh] overflow-y-auto pr-1">
                 {poCreatedSummary.orders.map(o => (
                   <div key={o.orderId} className="p-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-2 shadow-xs">
                     <div className="flex items-center justify-between">
@@ -333,7 +334,7 @@ export default function MrpPurchaseOrderModal({
               columns={poModalColumns}
               data={(mrpResult?.items || []).filter(i => selectedMrpKeys.includes(getMrpKey(i)) && i.shortageQuantity > 0)}
               rowKey={(item) => getMrpKey(item)}
-              maxHeight="18rem"
+              maxHeight="min(52dvh, 42rem)"
               emptyMessage="Seçili eksik hammadde bulunmuyor."
             />
 

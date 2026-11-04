@@ -46,7 +46,7 @@ export const LabelTemplateDesignerModal: React.FC<LabelTemplateDesignerModalProp
   const products = useApiQuery(() => api.products.list(), [], ['products']) || [];
   const assortmentTemplates = useApiQuery(() => api.assortmentTemplates.list(), [], ['assortmentTemplates']) || [];
   const systemSettings = useApiQuery(() => api.settings.get('global_settings'), [], ['settings']);
-  const companyName = systemSettings?.company?.companyTitle || systemSettings?.company?.companyName || 'PROERP AYAKKABI SAN. TİC. LTD. ŞTİ.';
+  const companyName = systemSettings?.company?.companyTitle || systemSettings?.company?.companyName || 'DMR Nexus';
 
   // Form State
   const [name, setName] = useState<string>('');
@@ -60,7 +60,7 @@ export const LabelTemplateDesignerModal: React.FC<LabelTemplateDesignerModalProp
 
   // Config Elements State
   const [showCompanyHeader, setShowCompanyHeader] = useState<boolean>(true);
-  const [companyHeaderText, setCompanyHeaderText] = useState<string>('PROERP SHOES & LOGISTICS');
+  const [companyHeaderText, setCompanyHeaderText] = useState<string>('DMR NEXUS SHOES & LOGISTICS');
   const [showProductCode, setShowProductCode] = useState<boolean>(true);
   const [showProductName, setShowProductName] = useState<boolean>(true);
   const [showColor, setShowColor] = useState<boolean>(true);
@@ -104,7 +104,7 @@ export const LabelTemplateDesignerModal: React.FC<LabelTemplateDesignerModalProp
       const c = templateToEdit.config;
       if (c) {
         setShowCompanyHeader(c.showCompanyHeader ?? true);
-        setCompanyHeaderText(c.companyHeaderText || 'PROERP SHOES & LOGISTICS');
+        setCompanyHeaderText(c.companyHeaderText || 'DMR NEXUS SHOES & LOGISTICS');
         setShowProductCode(c.showProductCode ?? true);
         setShowProductName(c.showProductName ?? true);
         setShowColor(c.showColor ?? true);
@@ -141,7 +141,7 @@ export const LabelTemplateDesignerModal: React.FC<LabelTemplateDesignerModalProp
       setIsDefault(false);
       
       setShowCompanyHeader(true);
-      setCompanyHeaderText(companyName || 'PROERP SHOES');
+      setCompanyHeaderText(companyName || 'DMR NEXUS SHOES');
       setShowProductCode(true);
       setShowProductName(true);
       setShowColor(true);

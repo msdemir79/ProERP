@@ -431,7 +431,7 @@ export default function CashStatementModal({ cashBox, isOpen, onClose }: CashSta
               </thead>
               <tbody className="divide-y divide-gray-100 text-gray-700">
                 {/* Devir Row */}
-                <tr className="bg-slate-50 dark:bg-slate-800/50/70 font-semibold text-gray-700">
+                <tr className="bg-slate-50 dark:bg-slate-800/70 font-semibold text-gray-700">
                   <td className="py-2 px-3.5 text-gray-500">
                     {startDate ? new Date(startDate).toLocaleDateString('tr-TR') : '-'}
                   </td>

@@ -24,7 +24,7 @@ export function Ring({
   return (
     <div className="relative shrink-0" style={{ width: size, height: size }}>
       <svg viewBox={`0 0 ${size} ${size}`} className="-rotate-90" style={{ width: size, height: size }}>
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#1e293b" strokeWidth={stroke} />
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="currentColor" strokeWidth={stroke} className="text-line-strong" />
         <circle
           cx={size / 2}
           cy={size / 2}
@@ -39,8 +39,8 @@ export function Ring({
         />
       </svg>
       <span className="absolute inset-0 flex flex-col items-center justify-center leading-none">
-        <span className="text-xs font-black text-white">{clamped}%</span>
-        {label && <span className="mt-0.5 text-[8px] font-bold text-slate-500">{label}</span>}
+        <span className="text-xs font-black text-fg-strong">{clamped}%</span>
+        {label && <span className="mt-0.5 text-[8px] font-bold text-fg-muted">{label}</span>}
       </span>
     </div>
   );
@@ -50,10 +50,10 @@ export function Ring({
 export function SectionBand({ index, title, desc }: { index: number; title: string; desc: string }) {
   return (
     <div className="mb-4 flex flex-wrap items-center gap-3">
-      <span className="inline-flex items-center gap-2 rounded-control bg-cyan-500/10 px-3 py-1.5 text-sm font-black uppercase tracking-wide text-cyan-300 ring-1 ring-cyan-500/30">
+      <span className="inline-flex items-center gap-2 rounded-control bg-brand-soft px-3 py-1.5 text-sm font-bold text-brand-fg ring-1 ring-brand/20">
         {index}. {title}
       </span>
-      <span className="text-xs font-semibold text-slate-400">{desc}</span>
+      <span className="text-xs font-semibold text-fg-muted">{desc}</span>
     </div>
   );
 }
@@ -62,7 +62,7 @@ export function SectionBand({ index, title, desc }: { index: number; title: stri
 export function DurationPill({ ms, accent }: { ms: number | null; accent: string }) {
   const text = ms == null ? '—' : `${Math.floor(ms / 3600000)}:${String(Math.floor((ms % 3600000) / 60000)).padStart(2, '0')}`;
   return (
-    <span className={cn('inline-flex items-center gap-1 rounded-pill border border-slate-700 bg-slate-900 px-2 py-0.5 text-[10px] font-black', accent)}>
+    <span className={cn('inline-flex items-center gap-1 rounded-pill border border-line bg-surface px-2 py-0.5 text-[10px] font-black', accent)}>
       {text}
     </span>
   );
@@ -71,13 +71,13 @@ export function DurationPill({ ms, accent }: { ms: number | null; accent: string
 /** Kart altı Planlanan/Üretilen çift satırı (mockup #1/#3). */
 export function PairsFooter({ s }: { s: StageSummary }) {
   return (
-    <div className="grid grid-cols-2 gap-2 border-t border-slate-800 px-3 py-2">
+    <div className="grid grid-cols-2 gap-2 border-t border-line px-3 py-2">
       <div>
-        <p className="text-[9px] font-bold uppercase tracking-wide text-slate-500">Planlanan</p>
-        <p className="text-sm font-black text-white tabular-nums">{formatPairs(s.plannedPairs)}</p>
+        <p className="text-[9px] font-bold uppercase tracking-wide text-fg-muted">Planlanan</p>
+        <p className="text-sm font-black text-fg-strong tabular-nums">{formatPairs(s.plannedPairs)}</p>
       </div>
       <div>
-        <p className="text-[9px] font-bold uppercase tracking-wide text-slate-500">Üretilen</p>
+        <p className="text-[9px] font-bold uppercase tracking-wide text-fg-muted">Üretilen</p>
         <p className={cn('text-sm font-black tabular-nums', STAGE_ACCENT[s.stage].text)}>{formatPairs(s.producedPairs)}</p>
       </div>
     </div>

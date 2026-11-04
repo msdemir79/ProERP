@@ -19,15 +19,15 @@ export function GibStandardWaybillTemplate({ waybillData, companySettings }: { w
   const totalQuantity = items.reduce((sum: number, it: any) => sum + (Number(it.quantity) || 0), 0);
   const totalAmount = waybillData.grandTotal || 0;
 
-  const compName = companySettings?.companyName || 'ProERP Ayakkabı';
-  const compTitle = companySettings?.companyTitle || companySettings?.companyName || 'PROERP AYAKKABI SAN. VE TİC. LTD. ŞTİ.';
+  const compName = companySettings?.companyName || 'DMR Nexus';
+  const compTitle = companySettings?.companyTitle || companySettings?.companyName || 'DMR Nexus';
   const compLogo = companySettings?.logo;
   const compAddress = companySettings?.address || 'İkitelli OSB Mah. Aykosan Sanayi Sitesi 4. Ada A Blok No: 12 Başakşehir / İSTANBUL';
   const compTaxOffice = companySettings?.taxOffice || 'İkitelli VD';
   const compTaxNumber = companySettings?.taxNumber || '7320489123';
   const compTradeReg = companySettings?.tradeRegistryNo || '489123';
   const compPhone = companySettings?.phone || '+90 212 671 00 00';
-  const compEmail = companySettings?.email || 'sevkiyat@proerp.com.tr';
+  const compEmail = companySettings?.email || '';
 
   return (
     <div className="space-y-4">
@@ -258,7 +258,7 @@ export function GibStandardWaybillTemplate({ waybillData, companySettings }: { w
                 const lineTotal = Number(item.total) || (qty * price);
 
                 return (
-                  <tr key={idx} className="hover:bg-slate-50 dark:bg-slate-800/50/80 transition-colors">
+                  <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-800/80 transition-colors">
                     <td className="p-2 text-center border-r border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 font-bold">
                       {idx + 1}
                     </td>
@@ -328,7 +328,7 @@ export function GibStandardWaybillTemplate({ waybillData, companySettings }: { w
         </div>
 
         {/* Sağ 5 Kolon: Resmi Toplamlar */}
-        <div className="col-span-5 border border-slate-300 rounded p-2.5 bg-slate-50 dark:bg-slate-800/50/50 space-y-1.5 text-[9px] font-mono">
+        <div className="col-span-5 border border-slate-300 rounded p-2.5 bg-slate-50 dark:bg-slate-800/50 space-y-1.5 text-[9px] font-mono">
           <div className="flex justify-between border-b border-slate-200 dark:border-slate-700 pb-1">
             <span className="text-slate-600 font-bold uppercase">Toplam Sevk Miktarı:</span>
             <span className="font-black text-slate-900 dark:text-slate-100 text-xs">{totalQuantity} Çift / Adet</span>
@@ -368,11 +368,11 @@ export function GibStandardWaybillTemplate({ waybillData, companySettings }: { w
         </p>
         <div className="grid grid-cols-3 gap-3">
           {/* Düzenleyen */}
-          <div className="border border-slate-300 rounded p-2.5 bg-slate-50 dark:bg-slate-800/50/50 text-center space-y-1">
+          <div className="border border-slate-300 rounded p-2.5 bg-slate-50 dark:bg-slate-800/50 text-center space-y-1">
             <span className="text-[9px] font-black text-slate-800 dark:text-slate-200 uppercase block border-b border-slate-200 dark:border-slate-700 pb-0.5">
               1. DÜZENLEYEN / DEPO SORUMLUSU
             </span>
-            <p className="text-[8px] text-slate-500 dark:text-slate-400 font-semibold">ProERP Fabrika Depo Şefliği</p>
+            <p className="text-[8px] text-slate-500 dark:text-slate-400 font-semibold">DMR Nexus Fabrika Depo Şefliği</p>
             <div className="h-12 flex items-center justify-center text-slate-300 italic text-[9px]">
               (Kaşe & Yetkili İmza)
             </div>
@@ -380,7 +380,7 @@ export function GibStandardWaybillTemplate({ waybillData, companySettings }: { w
           </div>
 
           {/* Taşıyıcı / Şoför */}
-          <div className="border border-slate-300 rounded p-2.5 bg-slate-50 dark:bg-slate-800/50/50 text-center space-y-1">
+          <div className="border border-slate-300 rounded p-2.5 bg-slate-50 dark:bg-slate-800/50 text-center space-y-1">
             <span className="text-[9px] font-black text-indigo-900 uppercase block border-b border-slate-200 dark:border-slate-700 pb-0.5">
               2. TAŞIYICI / ŞOFÖR
             </span>
@@ -394,7 +394,7 @@ export function GibStandardWaybillTemplate({ waybillData, companySettings }: { w
           </div>
 
           {/* Teslim Alan / Müşteri */}
-          <div className="border border-slate-300 rounded p-2.5 bg-slate-50 dark:bg-slate-800/50/50 text-center space-y-1">
+          <div className="border border-slate-300 rounded p-2.5 bg-slate-50 dark:bg-slate-800/50 text-center space-y-1">
             <span className="text-[9px] font-black text-emerald-900 uppercase block border-b border-slate-200 dark:border-slate-700 pb-0.5">
               3. TESLİM ALAN / ALICI
             </span>
@@ -426,8 +426,8 @@ export function GibCorporateWaybillTemplate({ waybillData, companySettings }: { 
   const totalQuantity = items.reduce((sum: number, it: any) => sum + (Number(it.quantity) || 0), 0);
   const totalAmount = waybillData.grandTotal || 0;
 
-  const compName = companySettings?.companyName || 'ProERP Ayakkabı';
-  const compTitle = companySettings?.companyTitle || companySettings?.companyName || 'PROERP LOJİSTİK VE ÜRETİM A.Ş.';
+  const compName = companySettings?.companyName || 'DMR Nexus';
+  const compTitle = companySettings?.companyTitle || companySettings?.companyName || 'DMR Nexus';
   const compLogo = companySettings?.logo;
   const compAddress = companySettings?.address || 'İkitelli OSB Aykosan San. Sit. No:12 Başakşehir / İST';
   const compTaxOffice = companySettings?.taxOffice || 'İkitelli VD';
@@ -566,7 +566,7 @@ export function GibDispatchChecklistTemplate({ waybillData, companySettings }: {
   const items = waybillData.items || [];
   const waybillDateStr = waybillData.date ? new Date(waybillData.date).toLocaleDateString('tr-TR') : '-';
   const totalQuantity = items.reduce((sum: number, it: any) => sum + (Number(it.quantity) || 0), 0);
-  const compName = companySettings?.companyName || 'ProERP';
+  const compName = companySettings?.companyName || 'DMR Nexus';
 
   return (
     <div className="space-y-4 font-mono text-[10px]">

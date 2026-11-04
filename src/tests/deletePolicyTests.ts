@@ -128,7 +128,7 @@ async function removeAs(resource: string, id: number, reason: string, password: 
 async function main(): Promise<void> {
   srv = await startTestServer(1);
   console.log('\n======================================================');
-  console.log(' PROERP SİLME POLİTİKASI TESTLERİ');
+  console.log(' DMR NEXUS SİLME POLİTİKASI TESTLERİ');
   console.log(` Hedef: ${srv.baseUrl} (canlı DB, in-process oturum)`);
   console.log('======================================================\n');
 

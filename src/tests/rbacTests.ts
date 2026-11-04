@@ -1,5 +1,5 @@
 /**
- * ProERP #48 — Yetki (RBAC) doğrulama testleri.
+ * DMR Nexus #48 — Yetki (RBAC) doğrulama testleri.
  *
  * Gerçek HTTP + gerçek MySQL + gerçek oturum/RBAC yolu üzerinde koşar. Harness
  * aynı süreç içinde ephemeral bir sunucu başlatır; `mintToken` ile farklı
@@ -14,13 +14,14 @@
  *   F. Süper Admin kapısı — clear/reset/impersonate yalnızca super_admin
  *   G. documentNumbers    — readOnly + settings izni (dashboard fallback kapanması)
  *
- * Testler canlı DB'ye karşı koşar ve YIKICI DEĞİLDİR: tüm yazma senaryoları
- * reddedilme (403) üzerinedir, başarılı hiçbir kayıt oluşturulmaz/silinmez.
+ * Testler kendi geçici veritabanında koşar; gerçek kullanıcı kayıtlarını okumaz.
  *
  * Çalıştırma: npm run test:rbac
  */
 import { startTestServer, mintToken, apiWithToken, type TestServer } from './harness.js';
-import { query } from '../../server/db.js';
+import { query, execute } from '../../server/db.js';
+import { INITIAL_ROLES } from '../data/initialRoles.js';
+import { assertTestDatabase } from './testDatabaseGuard.js';
 
 let passed = 0;
 let failed = 0;
@@ -66,6 +67,12 @@ async function resolveUserIds(): Promise<Record<string, number>> {
 }
 
 async function main(): Promise<void> {
+  assertTestDatabase();
+  // Her koşu kendi rol/kullanıcılarını izole veritabanında oluşturur.
+  for (const role of INITIAL_ROLES.filter(role => role.code !== 'super_admin')) {
+    const created = await execute('INSERT INTO roles (code,name,description,permissions,isSystem) VALUES (?,?,?,?,1)', [role.code, role.name, role.description || '', JSON.stringify(role.permissions)]);
+    await execute("INSERT INTO users (username,fullName,roleId,status) VALUES (?,?,?,'active')", [`test_${role.code}`, `Test ${role.name}`, created.insertId]);
+  }
   const ids = await resolveUserIds();
   const required = ['super_admin', 'sales_manager', 'auditor', 'finance_manager', 'hr_manager', 'warehouse_keeper', 'production_manager'];
   const missing = required.filter((r) => !(r in ids));
@@ -78,8 +85,8 @@ async function main(): Promise<void> {
   for (const role of required) tokens[role] = mintToken(ids[role]);
 
   console.log('\n======================================================');
-  console.log(' PROERP #48 — YETKİ (RBAC) DOĞRULAMA TESTLERİ');
-  console.log(` Hedef: ${srv.baseUrl} (canlı DB, in-process oturumlar)`);
+  console.log(' DMR NEXUS #48 — YETKİ (RBAC) DOĞRULAMA TESTLERİ');
+  console.log(` Hedef: ${srv.baseUrl} (izole test DB, in-process oturumlar)`);
   console.log('======================================================\n');
 
   // ---------------------------------------------------------------
@@ -307,6 +314,24 @@ async function main(): Promise<void> {
     expect((res.data as any)?.code).toBe('READ_ONLY_RESOURCE');
   });
 
+  for (const operation of ['create-stock-count', 'decide-stock-count', 'reconcile-reservation', 'reserve-stock', 'decide-purchase', 'set-accounting-period']) {
+    await test(`auditor POST /ops/${operation} → 403`, async () => {
+      const res = await apiWithToken(srv, tokens.auditor, 'POST', `/ops/${operation}`, {});
+      expect(res.status).toBe(403);
+    });
+  }
+  await test('auditor sayım özetini okuyabilir', async () => {
+    expect((await apiWithToken(srv, tokens.auditor, 'POST', '/ops/stock-count-summary', {})).status).toBe(200);
+  });
+  await test('hr_manager sayım özetini okuyamaz (inventory.view yok)', async () => {
+    expect((await apiWithToken(srv, tokens.hr_manager, 'POST', '/ops/stock-count-summary', {})).status).toBe(403);
+  });
+  for (const method of ['POST', 'PATCH', 'DELETE']) {
+    await test(`super_admin ${method} /stockCounts doğrudan yazma kapalı`, async () => {
+      const res = await apiWithToken(srv, tokens.super_admin, method, `/stockCounts${method === 'POST' ? '' : '/1'}`, {});
+      expect(res.status).toBe(403);
+    });
+  }
   // ---------------------------------------------------------------
   console.log('\n======================================================');
   console.log(` RBAC TEST RAPORU: ${passed} BAŞARILI, ${failed} HATALI`);

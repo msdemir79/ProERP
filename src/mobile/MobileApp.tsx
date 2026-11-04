@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { LogOut, ScanBarcode } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import MobileShell, { type MobileTab } from './MobileShell';
@@ -20,33 +21,52 @@ import {
 } from './nativeBridge';
 
 const TITLES: Record<MobileTab, string> = {
-  summary: 'ProERP Özet',
+  summary: 'DMR Nexus Özet',
   contacts: 'Cari Hesaplar',
   inventory: 'Stok Durumu',
   orders: 'Siparişler',
   production: 'Üretim Planlama',
 };
 
+const TAB_PATHS: Record<MobileTab, string> = {
+  summary: '/',
+  contacts: '/contacts',
+  inventory: '/inventory',
+  orders: '/orders',
+  production: '/production',
+};
+
+function tabForPath(pathname: string): MobileTab {
+  if (pathname.startsWith('/contacts')) return 'contacts';
+  if (pathname.startsWith('/inventory')) return 'inventory';
+  if (pathname.startsWith('/orders')) return 'orders';
+  if (pathname.startsWith('/production')) return 'production';
+  return 'summary';
+}
+
 /**
- * Mobil uygulama kökü: alt-sekme ile ekranlar arasında geçiş yapar.
- * Masaüstü Layout/Router'dan tamamen ayrıdır; AuthGate oturum yoksa giriş ekranını gösterir.
+ * Mobil uygulama kökü: alt sekmeleri URL ile eşler ve tarayıcı geçmişini korur.
+ * Masaüstü Layout'undan ayrıdır; AuthGate oturum yoksa giriş ekranını gösterir.
  */
 export default function MobileApp() {
-  const [tab, setTab] = useState<MobileTab>(() => window.location.pathname.startsWith('/production/workflows') ? 'production' : window.location.pathname.startsWith('/orders/workflows') ? 'orders' : window.location.pathname.startsWith('/inventory/workflows') ? 'inventory' : 'summary');
-  const [operationsOpen, setOperationsOpen] = useState(window.location.pathname.endsWith('/workflows'));
+  const location = useLocation();
+  const pathname = location.pathname.replace(/\/+$/, '') || '/';
+  const navigate = useNavigate();
+  const tab = tabForPath(pathname);
+  const operationsOpen = pathname.endsWith('/workflows');
   const [scannerOpen, setScannerOpen] = useState(false);
   const { logout, hasPermission } = useAuth();
   const { actualTheme } = useTheme();
 
   const handleHeaderScan = async () => {
-    setOperationsOpen(false);
+    if (operationsOpen) navigate(TAB_PATHS[tab]);
     if (isNativeApp()) {
       const code = await scanBarcodeNative();
       if (code) {
         if (code.startsWith('WO-')) {
-          setTab('production');
+          navigate(TAB_PATHS.production);
         } else {
-          setTab('inventory');
+          navigate(TAB_PATHS.inventory);
         }
       }
       return;
@@ -58,11 +78,11 @@ export default function MobileApp() {
   useEffect(() => {
     if (tab === 'summary' && !operationsOpen) return;
     return registerBackButtonHandler(() => {
-      if (operationsOpen) { setOperationsOpen(false); return true; }
-      setTab('summary');
+      if (operationsOpen) { navigate(TAB_PATHS[tab]); return true; }
+      navigate(TAB_PATHS.summary);
       return true;
     });
-  }, [tab, operationsOpen]);
+  }, [tab, operationsOpen, navigate]);
 
   // Durum çubuğunu (StatusBar) aktif tema ile eşle
   useEffect(() => {
@@ -74,11 +94,13 @@ export default function MobileApp() {
     void initNativeBridge({
       isDark: actualTheme === 'dark',
       onDefaultBack: () => {
-        if (tab !== 'summary') {
-          setTab('summary');
-          return true;
-        }
-        return false;
+        const currentPath = window.location.pathname.replace(/\/+$/, '') || '/';
+        if (currentPath === '/') return false;
+        const target = currentPath.endsWith('/workflows')
+          ? currentPath.slice(0, -'/workflows'.length)
+          : TAB_PATHS.summary;
+        navigate(target);
+        return true;
       },
     });
   }, []);
@@ -88,7 +110,7 @@ export default function MobileApp() {
       <MobileShell
         title={TITLES[tab]}
         active={tab}
-        onTab={next => { setOperationsOpen(false); setTab(next); }}
+        onTab={next => navigate(TAB_PATHS[next])}
         right={
           <div className="flex items-center gap-1">
             <button
@@ -112,7 +134,7 @@ export default function MobileApp() {
           </div>
         }
       >
-        {(['inventory', 'orders', 'production'] as string[]).includes(tab) && hasPermission(tab as 'inventory' | 'orders' | 'production', 'view') && <Button className="w-full" onClick={() => setOperationsOpen(value => !value)}>{operationsOpen ? 'Modüle geri dön' : tab === 'inventory' ? 'Stok rezervasyonları' : tab === 'orders' ? 'Satın alma talepleri' : 'Kalite kontrolleri'}</Button>}
+        {(['inventory', 'orders', 'production'] as string[]).includes(tab) && hasPermission(tab as 'inventory' | 'orders' | 'production', 'view') && <Button className="w-full" onClick={() => navigate(operationsOpen ? TAB_PATHS[tab] : `${TAB_PATHS[tab]}/workflows`)}>{operationsOpen ? 'Modüle geri dön' : tab === 'inventory' ? 'Stok rezervasyonları' : tab === 'orders' ? 'Satın alma talepleri' : 'Kalite kontrolleri'}</Button>}
         {operationsOpen ? <Suspense fallback={<p role="status">Operasyonlar yükleniyor…</p>}><OperationsHub key={tab} initialTab={tab === 'production' ? 'quality' : tab === 'orders' ? 'purchasing' : 'reservations'} /></Suspense> : <>
           {tab === 'summary' && <MobileDashboard />}
           {tab === 'contacts' && <MobileContacts />}
@@ -128,11 +150,11 @@ export default function MobileApp() {
           onClose={() => setScannerOpen(false)}
           onProductScanned={(p) => {
             setScannerOpen(false);
-            setTab('inventory');
+            navigate(TAB_PATHS.inventory);
           }}
           onWorkOrderFound={(wo) => {
             setScannerOpen(false);
-            setTab('production');
+            navigate(TAB_PATHS.production);
           }}
         />
       )}

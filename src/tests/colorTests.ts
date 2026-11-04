@@ -1,5 +1,5 @@
 /**
- * ProERP — Merkezi Renk Tanımlama Modülü testleri (şartname §20: Test 1–14).
+ * DMR Nexus — Merkezi Renk Tanımlama Modülü testleri (şartname §20: Test 1–14).
  *
  * İki katman vardır:
  *   A) Birim — saf doğrulama/türetme fonksiyonları (DB gerektirmez):
@@ -127,7 +127,7 @@ function whereUrl(resource: string, where: Record<string, any>): string {
 async function main(): Promise<void> {
   // =================================================================
   console.log('\n======================================================');
-  console.log(' PROERP — MERKEZİ RENK MODÜLÜ TESTLERİ (şartname §20)');
+  console.log(' DMR NEXUS — MERKEZİ RENK MODÜLÜ TESTLERİ (şartname §20)');
   console.log('======================================================\n');
 
   // -----------------------------------------------------------------

@@ -895,7 +895,7 @@ export default function AttendanceTab({ employees, onAttendanceChanged }: Attend
                 const isSelected = selectedEmpIds.includes(emp.id!);
 
                 return (
-                  <tr key={emp.id} className={`transition-colors ${isSelected ? 'bg-indigo-50/40' : 'hover:bg-slate-50 dark:bg-slate-800/50/80'}`}>
+                  <tr key={emp.id} className={`transition-colors ${isSelected ? 'bg-indigo-50/40' : 'hover:bg-slate-50 dark:hover:bg-slate-800/80'}`}>
                     {/* Checkbox */}
                     <td className="p-2 text-center sticky left-0 bg-white dark:bg-slate-900 group-hover:bg-slate-50 dark:bg-slate-800/50 z-20 border-r border-slate-200 dark:border-slate-700 shadow-xs">
                       <input
@@ -982,7 +982,7 @@ export default function AttendanceTab({ employees, onAttendanceChanged }: Attend
                     <td className="p-2 text-center font-bold text-emerald-700 bg-emerald-50/30 border-l border-slate-300">
                       {summary.worked}
                     </td>
-                    <td className="p-2 text-center font-medium text-slate-600 bg-slate-50 dark:bg-slate-800/50/50">
+                    <td className="p-2 text-center font-medium text-slate-600 bg-slate-50 dark:bg-slate-800/50">
                       {summary.rest}
                     </td>
                     <td className="p-2 text-center font-medium text-sky-700 bg-sky-50/30">

@@ -64,8 +64,8 @@ export default function StockDetailRow({ p, isExpanded, rowDensity, copiedBarcod
                     "w-full flex items-center justify-between gap-3 cursor-pointer select-none transition-colors",
                     rowDensity === 'compact' ? "py-2 px-3 sm:px-3.5" : "py-2.5 px-3.5 sm:px-4",
                     isExpanded 
-                      ? "bg-slate-50 dark:bg-slate-800/50/90 border-b border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100" 
-                      : "bg-white dark:bg-slate-900 hover:bg-slate-50 dark:bg-slate-800/50/80 text-slate-900 dark:text-slate-100"
+                      ? "bg-slate-50 dark:bg-slate-800/90 border-b border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100"
+                      : "bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/80 text-slate-900 dark:text-slate-100"
                   )}
                 >
                   {/* SOL TARAF: Ok, Resim, Kod, Kategori Türü, İsim ve Etiketler */}
@@ -244,7 +244,7 @@ export default function StockDetailRow({ p, isExpanded, rowDensity, copiedBarcod
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
                       transition={{ duration: 0.15 }}
-                      className="border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50/60 p-3 sm:p-4 space-y-3"
+                      className="border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 p-3 sm:p-4 space-y-3"
                     >
                       {/* Üst Bilgi Şeridi */}
                       <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
@@ -382,7 +382,7 @@ export default function StockDetailRow({ p, isExpanded, rowDensity, copiedBarcod
                                   <tbody>
                                     {/* Koli Şablon Dağılımı */}
                                     {c.sizeList.some(s => (s.templateRatio || 0) > 0) && (
-                                      <tr className="border-b border-slate-100 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50/40">
+                                      <tr className="border-b border-slate-100 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/40">
                                         <td className="py-1.5 px-2 text-left font-bold text-[9px] uppercase tracking-wider text-slate-400 border-r border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
                                           Koli Şablonu
                                         </td>
@@ -402,7 +402,7 @@ export default function StockDetailRow({ p, isExpanded, rowDensity, copiedBarcod
 
                                     {/* Mevcut Stok */}
                                     <tr className="border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
-                                      <td className="py-2 px-2 text-left font-black text-xs uppercase tracking-wider text-slate-900 dark:text-slate-100 border-r border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50/80">
+                                      <td className="py-2 px-2 text-left font-black text-xs uppercase tracking-wider text-slate-900 dark:text-slate-100 border-r border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80">
                                         Mevcut Stok
                                       </td>
                                       {c.sizeList.map((s, sIdx) => {
@@ -431,7 +431,7 @@ export default function StockDetailRow({ p, isExpanded, rowDensity, copiedBarcod
                                     </tr>
 
                                     {/* Beden Tekil Barkodu */}
-                                    <tr className="text-[9px] text-slate-400 bg-slate-50 dark:bg-slate-800/50/30">
+                                    <tr className="text-[9px] text-slate-400 bg-slate-50 dark:bg-slate-800/30">
                                       <td className="py-1 px-2 text-left font-bold text-[8px] uppercase tracking-wider text-slate-400 border-r border-slate-200 dark:border-slate-700">
                                         Beden Barkod
                                       </td>

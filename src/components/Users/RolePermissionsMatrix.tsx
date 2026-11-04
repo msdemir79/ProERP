@@ -412,7 +412,7 @@ export default function RolePermissionsMatrix({
                 return (
                   <tr 
                     key={mod.id} 
-                    className={`transition-colors ${idx % 2 === 0 ? 'bg-white dark:bg-slate-900' : 'bg-slate-50 dark:bg-slate-800/50/50'} hover:bg-indigo-50/30`}
+                    className={`transition-colors ${idx % 2 === 0 ? 'bg-white dark:bg-slate-900' : 'bg-slate-50 dark:bg-slate-800/50'} hover:bg-indigo-50/30`}
                   >
                     {/* Module Column */}
                     <td className="py-3 px-4">

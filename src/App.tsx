@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react';
 import type { ReactNode } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { FileQuestion } from 'lucide-react';
 import Layout from './components/Layout';
 const OperationsHub = lazy(() => import('./components/OperationsHub'));
 const Dashboard = lazy(() => import('./components/Dashboard'));
@@ -32,6 +33,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { FeedbackHost } from './lib/feedback';
 import LoginScreen from './components/Common/LoginScreen';
+import EmptyState from './components/Common/EmptyState';
 import { useIsMobile } from './hooks/useIsMobile';
 const MobileApp = lazy(() => import('./mobile/MobileApp'));
 
@@ -64,23 +66,44 @@ export default function App() {
       <AuthProvider>
         <FeedbackHost />
         <AuthGate>
-        <Suspense fallback={<div role="status" className="p-10 text-center text-fg-muted">Sayfa yükleniyor…</div>}><RootSwitch /></Suspense>
+          <BrowserRouter>
+            <Suspense fallback={<div role="status" className="p-10 text-center text-fg-muted">Sayfa yükleniyor…</div>}><RootSwitch /></Suspense>
+          </BrowserRouter>
         </AuthGate>
     </AuthProvider>
     </ThemeProvider>
   );
 }
 
-/** Dar ekranda mobil kabuk, aksi halde masaüstü yönlendirme tablosu. */
+/** Mobil kabuğun desteklediği sayfalar; diğer modüller dar ekranda da gerçek adresleriyle açılır. */
+const mobileRoutes = new Set([
+  '/', '/contacts', '/inventory', '/orders', '/production',
+  '/inventory/workflows', '/orders/workflows', '/production/workflows',
+]);
+
 function RootSwitch() {
   const isMobile = useIsMobile();
-  if (isMobile) return <BrowserRouter><MobileApp /></BrowserRouter>;
+  const { pathname } = useLocation();
+  const route = pathname.replace(/\/+$/, '') || '/';
+  if (isMobile && mobileRoutes.has(route)) return <MobileApp />;
   return <DesktopRoutes />;
+}
+
+function NotFound() {
+  return (
+    <div className="mx-auto max-w-2xl rounded-card border border-line bg-surface shadow-card">
+      <EmptyState
+        icon={<FileQuestion />}
+        title="Sayfa bulunamadı"
+        description="Adres değişmiş veya yanlış yazılmış olabilir. Ana sayfadan devam edebilirsiniz."
+        action={<Link to="/" className="rounded-control bg-brand px-4 py-2 text-xs font-bold text-on-brand hover:bg-brand-hover">Ana sayfaya dön</Link>}
+      />
+    </div>
+  );
 }
 
 function DesktopRoutes() {
   return (
-    <BrowserRouter>
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Dashboard />} />
@@ -112,8 +135,8 @@ function DesktopRoutes() {
             <Route path="contacts" element={<Contacts />} />
             <Route path="users" element={<UsersManagement />} />
             <Route path="settings" element={<SettingsHub />} />
+            <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
-      </BrowserRouter>
   );
 }

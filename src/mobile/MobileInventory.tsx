@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Search, AlertTriangle, ChevronRight, ScanBarcode } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
 import { api } from '../api/client';
 import { useApiQueryFull } from '../hooks/useApiQuery';
 import type { Product } from '../types';
@@ -11,11 +12,48 @@ import { isNativeApp, scanBarcodeNative } from './nativeBridge';
 
 /** Mobil stok listesi: kritik (stok<=min) uyarıları + arama + kamera barkod okuyucu; karta dokununca detay açılır. */
 export default function MobileInventory() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const requestedProductId = searchParams.get('productId');
   const [q, setQ] = useState('');
   const [onlyCritical, setOnlyCritical] = useState(false);
   const [sel, setSel] = useState<Product | null>(null);
   const [scannerOpen, setScannerOpen] = useState(false);
   const { data, loading, refetch } = useApiQueryFull<Product[]>(() => api.products.list(), [], ['products']);
+
+  useEffect(() => {
+    if (!requestedProductId) { setSel(null); return; }
+    const id = Number(requestedProductId);
+    if (!Number.isSafeInteger(id) || id <= 0) { setSel(null); return; }
+    const listedProduct = data?.find((product) => product.id === id);
+    if (listedProduct) { setSel(listedProduct); return; }
+    let active = true;
+    api.products.get(id)
+      .then((product) => { if (active) setSel(product ?? null); })
+      .catch(() => { if (active) setSel(null); });
+    return () => { active = false; };
+  }, [requestedProductId, data]);
+
+  const openProduct = (product: Product) => {
+    setSel(product);
+    if (product.id != null) {
+      setSearchParams((current) => {
+        const next = new URLSearchParams(current);
+        next.set('productId', String(product.id));
+        return next;
+      });
+    }
+  };
+
+  const closeProduct = () => {
+    setSel(null);
+    if (requestedProductId) {
+      setSearchParams((current) => {
+        const next = new URLSearchParams(current);
+        next.delete('productId');
+        return next;
+      }, { replace: true });
+    }
+  };
 
   const handleOpenScanner = async () => {
     if (isNativeApp()) {
@@ -28,7 +66,7 @@ export default function MobileInventory() {
             p.variantBarcodes?.some((vb) => vb.barcode === code),
         );
         if (found) {
-          setSel(found);
+          openProduct(found);
         } else {
           setQ(code);
         }
@@ -102,7 +140,7 @@ export default function MobileInventory() {
             <button
               type="button"
               key={p.id ?? p.code}
-              onClick={() => setSel(p)}
+              onClick={() => openProduct(p)}
               className={cn(
                 'w-full text-left rounded-xl border bg-white dark:bg-slate-900 px-3 py-3',
                 critical ? 'border-rose-300 dark:border-rose-900' : 'border-slate-200 dark:border-slate-800',
@@ -133,7 +171,7 @@ export default function MobileInventory() {
         })}
       </div>
 
-      {sel && <MobileStockDetail product={sel} onClose={() => setSel(null)} />}
+      {sel && <MobileStockDetail product={sel} onClose={closeProduct} />}
 
       {scannerOpen && (
         <CameraBarcodeScannerModal
@@ -142,7 +180,7 @@ export default function MobileInventory() {
           initialMode="stock_count"
           onProductScanned={(scannedProduct) => {
             setScannerOpen(false);
-            setSel(scannedProduct);
+            openProduct(scannedProduct);
             void refetch();
           }}
           onSuccess={() => {

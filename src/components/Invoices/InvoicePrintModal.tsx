@@ -161,16 +161,16 @@ export function InvoicePrintModal({
   const amountInWords = invoiceDetail ? numberToTurkishWords(invoiceDetail.grandTotal || 0) : '';
 
   // Firma Bilgileri (Dinamik Ayarlardan)
-  const compName = companySettings?.companyName || 'ProERP Ayakkabı';
-  const compTitle = companySettings?.companyTitle || companySettings?.companyName || 'PROERP AYAKKABI SAN. VE TİC. LTD. ŞTİ.';
+  const compName = companySettings?.companyName || 'DMR Nexus';
+  const compTitle = companySettings?.companyTitle || companySettings?.companyName || 'DMR Nexus';
   const compLogo = companySettings?.logo;
   const compAddress = companySettings?.address || 'Organize Sanayi Bölgesi 12. Cadde No: 45 / Başakşehir / İSTANBUL';
   const compTaxOffice = companySettings?.taxOffice || 'İkitelli V.D.';
   const compTaxNumber = companySettings?.taxNumber || '7340592811';
   const compTradeReg = companySettings?.tradeRegistryNo || '948123-5';
   const compPhone = companySettings?.phone || '(0212) 555 01 99';
-  const compEmail = companySettings?.email || 'muhasebe@proerp.com';
-  const compWebsite = companySettings?.website || 'www.proerp.com.tr';
+  const compEmail = companySettings?.email || '';
+  const compWebsite = companySettings?.website || '';
   const compBank = companySettings?.bankName || 'T.C. Ziraat Bankası - İkitelli Şubesi';
   const compIban = companySettings?.iban || 'TR33 0001 0002 0003 0004 0005 01';
 

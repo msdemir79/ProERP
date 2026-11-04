@@ -30,7 +30,8 @@ try {
   server = spawn(binary, ['--no-defaults', `--datadir=${dataDir}`, '--bind-address=127.0.0.1', `--port=${port}`, '--mysqlx=0', `--log-error=${logFile}`], { stdio: 'ignore', windowsHide: true });
   server.on('error', error => console.error(error.message));
   let ready = false;
-  for (let attempt = 0; attempt < 100; attempt++) {
+  // Windows'ta ilk InnoDB hazırlığı yoğun disk kullanımında 30 saniyeyi aşabilir.
+  for (let attempt = 0; attempt < 400; attempt++) {
     try {
       const connection = await mysql.createConnection({ host: '127.0.0.1', port, user: 'root', password: '', connectTimeout: 1000 });
       await connection.end(); ready = true; break;

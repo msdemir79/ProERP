@@ -12,7 +12,7 @@ export const INITIAL_BARCODE_TEMPLATES: Omit<BarcodeTemplate, 'id'>[] = [
     isDefault: true,
     config: {
       showCompanyHeader: true,
-      companyHeaderText: 'PROERP SHOES & LOGISTICS',
+      companyHeaderText: 'DMR NEXUS SHOES & LOGISTICS',
       showProductCode: true,
       showProductName: true,
       showColor: true,
@@ -46,7 +46,7 @@ export const INITIAL_BARCODE_TEMPLATES: Omit<BarcodeTemplate, 'id'>[] = [
     isDefault: true,
     config: {
       showCompanyHeader: true,
-      companyHeaderText: 'PROERP AYAKKABI',
+      companyHeaderText: 'DMR NEXUS AYAKKABI',
       showProductCode: true,
       showProductName: true,
       showColor: true,
@@ -79,7 +79,7 @@ export const INITIAL_BARCODE_TEMPLATES: Omit<BarcodeTemplate, 'id'>[] = [
     isDefault: true,
     config: {
       showCompanyHeader: true,
-      companyHeaderText: 'PROERP FOOTWEAR MFG',
+      companyHeaderText: 'DMR NEXUS FOOTWEAR MFG',
       showProductCode: true,
       showProductName: true,
       showColor: true,
@@ -112,7 +112,7 @@ export const INITIAL_BARCODE_TEMPLATES: Omit<BarcodeTemplate, 'id'>[] = [
     isDefault: false,
     config: {
       showCompanyHeader: true,
-      companyHeaderText: 'PROERP DEPO',
+      companyHeaderText: 'DMR NEXUS DEPO',
       showProductCode: true,
       showProductName: true,
       showColor: true,

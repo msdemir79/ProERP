@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useMemo, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '../api/client';
 import { useApiQuery, useApiQueryFull } from '../hooks/useApiQuery';
 import type { Contact, EntityType } from '../types';
@@ -59,6 +59,8 @@ type SortOption = 'code_asc' | 'code_desc' | 'name_asc' | 'name_desc' | 'type_as
 
 export default function Contacts() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const requestedContactId = searchParams.get('contactId');
   const contactsQuery = useApiQueryFull(() => api.contacts.list(), [], ['contacts']);
   const contacts = contactsQuery.data;
 
@@ -84,6 +86,27 @@ export default function Contacts() {
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [deleteConfirmContact, setDeleteConfirmContact] = useState<Contact | null>(null);
   const [detailContact, setDetailContact] = useState<Contact | null>(null);
+
+  useEffect(() => {
+    const id = Number(requestedContactId);
+    if (!requestedContactId || !Number.isSafeInteger(id) || id <= 0) return;
+    let active = true;
+    api.contacts.get(id)
+      .then(contact => { if (active && contact) setDetailContact(contact); })
+      .catch(() => { /* Liste ekranındaki hata durumu mevcut sorgu tarafından gösterilir. */ });
+    return () => { active = false; };
+  }, [requestedContactId]);
+
+  const closeDetailContact = () => {
+    setDetailContact(null);
+    if (requestedContactId) {
+      setSearchParams(current => {
+        const next = new URLSearchParams(current);
+        next.delete('contactId');
+        return next;
+      }, { replace: true });
+    }
+  };
 
   // Financial Metrics Calculation
   const metrics = useMemo(() => {
@@ -759,7 +782,7 @@ export default function Contacts() {
       {/* PANEL 6: Cari Detayı (DMR Kinetiq — sağdan kayan okunur panel) */}
       <DetailPanel
         isOpen={!!detailContact}
-        onClose={() => setDetailContact(null)}
+        onClose={closeDetailContact}
         title={detailContact?.name || 'Cari Detayı'}
         widthClass="max-w-[480px]"
         badge={

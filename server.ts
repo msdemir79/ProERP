@@ -193,7 +193,7 @@ async function startServer() {
   }
 
   const server = app.listen(PORT, HOST, () => {
-    console.log(`ProERP sunucusu http://${HOST === '0.0.0.0' ? 'localhost' : HOST}:${PORT} adresinde çalışıyor.`);
+    console.log(`DMR Nexus sunucusu http://${HOST === '0.0.0.0' ? 'localhost' : HOST}:${PORT} adresinde çalışıyor.`);
     if (HOST === '0.0.0.0') {
       console.warn('');
       console.warn('UYARI: Sunucu tüm ağ arayüzlerine (0.0.0.0) açık. Giriş yapmadan hiçbir veriye erişilemez,');

@@ -1,7 +1,5 @@
 import React from 'react';
 import { LucideIcon } from 'lucide-react';
-import { api } from '../api/client';
-import { useApiQuery } from '../hooks/useApiQuery';
 import { cn } from '../lib/utils';
 
 export type PageHeaderColor = 'indigo' | 'emerald' | 'purple' | 'amber' | 'blue' | 'rose' | 'slate';
@@ -19,42 +17,34 @@ interface PageHeaderProps {
 
 const colorStyles: Record<PageHeaderColor, {
   gradient: string;
-  shadow: string;
   badge: string;
 }> = {
   indigo: {
     gradient: 'from-indigo-600 to-indigo-800 text-white',
-    shadow: 'shadow-indigo-600/20 ring-1 ring-indigo-500/30',
     badge: 'bg-indigo-50 text-indigo-700 border-indigo-200/70',
   },
   emerald: {
     gradient: 'from-emerald-600 to-emerald-800 text-white',
-    shadow: 'shadow-emerald-600/20 ring-1 ring-emerald-500/30',
     badge: 'bg-emerald-50 text-emerald-700 border-emerald-200/70',
   },
   purple: {
     gradient: 'from-purple-600 to-purple-800 text-white',
-    shadow: 'shadow-purple-600/20 ring-1 ring-purple-500/30',
     badge: 'bg-purple-50 text-purple-700 border-purple-200/70',
   },
   amber: {
     gradient: 'from-amber-500 to-amber-700 text-white',
-    shadow: 'shadow-amber-500/20 ring-1 ring-amber-500/30',
     badge: 'bg-amber-50 text-amber-800 border-amber-200/70',
   },
   blue: {
     gradient: 'from-blue-600 to-blue-800 text-white',
-    shadow: 'shadow-blue-600/20 ring-1 ring-blue-500/30',
     badge: 'bg-blue-50 text-blue-700 border-blue-200/70',
   },
   rose: {
     gradient: 'from-rose-600 to-rose-800 text-white',
-    shadow: 'shadow-rose-600/20 ring-1 ring-rose-500/30',
     badge: 'bg-rose-50 text-rose-700 border-rose-200/70',
   },
   slate: {
     gradient: 'from-slate-700 to-slate-900 text-white',
-    shadow: 'shadow-slate-800/20 ring-1 ring-slate-600/30',
     badge: 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700',
   },
 };
@@ -72,33 +62,20 @@ export default function PageHeader({
   const styles = colorStyles[iconColor] || colorStyles.indigo;
   const formattedTitle = title;
 
-  const appSettings = useApiQuery(() => api.settings.get('global_settings'), [], ['settings']);
-  const companyLogo = appSettings?.company?.logo;
-
   return (
     <div className={cn("bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4 font-sans transition-colors duration-200", className)}>
       <div className="flex items-center gap-3.5 min-w-0">
-        {companyLogo ? (
-          <div className="relative shrink-0 group">
-            <div className="w-11 h-11 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-1 flex items-center justify-center shadow-xs overflow-hidden transition-transform group-hover:scale-105">
-              <img src={companyLogo} alt="Firma Logosu" className="max-w-full max-h-full object-contain" />
-            </div>
-            <div className={cn(
-              "absolute -bottom-1 -right-1 w-5 h-5 rounded-md flex items-center justify-center text-white shadow-xs bg-gradient-to-br ring-2 ring-white dark:ring-slate-900",
-              styles.gradient
-            )}>
-              <Icon className="w-3 h-3" />
-            </div>
+        <div className="relative shrink-0 group">
+          <div className="w-11 h-11 rounded-xl bg-slate-950 border border-slate-200 dark:border-slate-700 flex items-center justify-center shadow-xs overflow-hidden transition-transform group-hover:scale-105">
+            <img src="/brand/dmr-nexus-icon.png" alt="DMR Nexus" className="w-full h-full object-contain" />
           </div>
-        ) : (
           <div className={cn(
-            "w-10 h-10 rounded-xl bg-gradient-to-br flex items-center justify-center shrink-0 shadow-md transition-transform hover:scale-105",
-            styles.gradient,
-            styles.shadow
+            "absolute -bottom-1 -right-1 w-5 h-5 rounded-md flex items-center justify-center text-white shadow-xs bg-gradient-to-br ring-2 ring-white dark:ring-slate-900",
+            styles.gradient
           )}>
-            <Icon className="w-5 h-5 drop-shadow-xs" />
+            <Icon className="w-3 h-3" />
           </div>
-        )}
+        </div>
         <div className="space-y-0.5 min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <h1 className="text-base md:text-lg font-bold text-slate-900 dark:text-slate-100 tracking-tight leading-snug truncate normal-case">

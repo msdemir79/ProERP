@@ -143,7 +143,7 @@ async function main() {
     dumpFile: 'dump.sql',
     dumpBytes,
     uploads: uploadsCopied ? { dir: 'uploads', files: uploadsCount } : null,
-    tool: 'proerp db:backup',
+    tool: 'DMR Nexus db:backup',
     format: 1,
   };
   fs.writeFileSync(path.join(outDir, 'manifest.json'), JSON.stringify(manifest, null, 2));

@@ -433,8 +433,8 @@ export function PurchaseOrderPrintModal({
 
   const isPurchase = (order?.type || 'purchase') === 'purchase';
   const currency = order?.currency || 'TRY';
-  const companyTitle = companySettings?.companyTitle || companySettings?.companyName || 'PRO-ERP AYAKKABI SANAYİ VE TİCARET A.Ş.';
-  const companyName = companySettings?.companyName || 'PRO-ERP AYAKKABI';
+  const companyTitle = companySettings?.companyTitle || companySettings?.companyName || 'DMR Nexus';
+  const companyName = companySettings?.companyName || 'DMR Nexus';
 
   // Direct Print Handling
   const handlePrint = async () => {

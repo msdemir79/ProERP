@@ -28,7 +28,10 @@ export default function MobileShell({ title, active, onTab, right, children }: P
   return (
     <div className="min-h-screen flex flex-col bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
       <header className="sticky top-0 z-20 flex items-center justify-between gap-2 px-4 pt-[calc(env(safe-area-inset-top)_+_0.75rem)] pb-3 bg-white/95 dark:bg-slate-900/95 backdrop-blur border-b border-slate-200 dark:border-slate-800">
-        <h1 className="text-base font-semibold truncate">{title}</h1>
+        <div className="flex min-w-0 items-center gap-2">
+          <img src="/brand/dmr-nexus-icon.png" alt="DMR Nexus" className="h-7 w-7 shrink-0 object-contain" />
+          <h1 className="text-base font-semibold truncate">{title}</h1>
+        </div>
         <div className="shrink-0">{right}</div>
       </header>
 

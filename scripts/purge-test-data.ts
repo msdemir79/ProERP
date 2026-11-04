@@ -84,7 +84,7 @@ async function confirm(database: string): Promise<boolean> {
 async function main(): Promise<void> {
   const database = dbConfig.database as string;
   console.log('\n======================================================');
-  console.log(' PROERP — TEST VERİSİ TEMİZLİĞİ');
+  console.log(' DMR NEXUS — TEST VERİSİ TEMİZLİĞİ');
   console.log(` Hedef: ${dbConfig.user}@${dbConfig.host}:${dbConfig.port}/${database}`);
   console.log(` Mod  : ${apply ? 'UYGULA (--apply)' : 'KURU KOŞU (yalnızca listeler)'}`);
   console.log('======================================================');

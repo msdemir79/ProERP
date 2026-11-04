@@ -23,7 +23,7 @@ export function PoTemplateCompact({
                   <div className="border-b-2 border-slate-900 pb-2 flex items-center justify-between">
                     <div>
                       <span className="text-[10px] font-black uppercase text-indigo-700 tracking-wider">
-                        PRO-ERP İMALAT TAKİP FİŞİ
+                        DMR NEXUS İMALAT TAKİP FİŞİ
                       </span>
                       <h1 className="text-base font-black text-slate-900 uppercase">
                         ATÖLYE & DEPO TESLİM ÇİZELGESİ

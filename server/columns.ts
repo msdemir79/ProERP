@@ -1029,6 +1029,25 @@ export const RESOURCES: Record<string, ResourceDef> = {
     jsonColumns: ["items"],
     timestamps: ["createdAt"],
   },
+  stockCounts: {
+    table: "stockCounts",
+    primaryKey: "id",
+    columns: [
+      { name: "id", type: "bigint" },
+      { name: "countNumber", type: "varchar" },
+      { name: "items", type: "json" },
+      { name: "status", type: "enum" },
+      { name: "notes", type: "text" },
+      { name: "decisionReason", type: "text" },
+      { name: "createdBy", type: "bigint" },
+      { name: "decidedBy", type: "bigint" },
+      { name: "createdAt", type: "datetime" },
+      { name: "decidedAt", type: "datetime" },
+      { name: "version", type: "int" },
+    ],
+    jsonColumns: ["items"],
+    timestamps: ["createdAt"],
+  },
 };
 
 export function getResource(name: string): ResourceDef | undefined {

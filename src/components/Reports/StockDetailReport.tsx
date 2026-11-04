@@ -11,7 +11,6 @@ import {
   Box,
   Layers,
   Filter,
-  Copy,
   Maximize2,
   Minimize2,
   RefreshCw,
@@ -29,6 +28,10 @@ import type { Product, AssortmentTemplate, StockCategoryType } from '../../types
 import { CATEGORY_TYPE_META } from './stockCategoryMeta';
 import { getCartonSize } from '../../lib/carton';
 import StockDetailRow from './StockDetailRow';
+import PageHeader from '../PageHeader';
+import Button from '../Common/Button';
+import { controlClass } from '../Common/Field';
+import SegmentedFilter from '../Common/SegmentedFilter';
 
 export type StockClassification = 'all' | 'mamul' | 'mamul_disi';
 export type SubClassification = 'all' | 'semi_finished' | 'raw_material' | 'accessory';
@@ -64,11 +67,6 @@ export default function StockDetailReport() {
   const [isSyncing, setIsSyncing] = React.useState(false);
   const [syncSuccess, setSyncSuccess] = React.useState(false);
   const [rowDensity, setRowDensity] = React.useState<'compact' | 'normal'>('compact');
-
-  // Auto-sync variant stocks on load
-  React.useEffect(() => {
-    inventoryService.syncProductVariantStocks().catch(err => console.error('Sync error:', err));
-  }, []);
 
   const handleManualSync = async () => {
     setIsSyncing(true);
@@ -130,7 +128,7 @@ export default function StockDetailReport() {
   }, [products]);
 
   // Process and filter products
-  const processedProducts = React.useMemo(() => {
+  const baseProducts = React.useMemo(() => {
     if (!products) return [];
 
     // Map template map for quick lookup
@@ -315,11 +313,6 @@ export default function StockDetailReport() {
         return false;
       }
 
-      // 4. Secondary filter type
-      if (filterType === 'broken' && !p.hasBrokenSize) return false;
-      if (filterType === 'critical' && !p.isCritical) return false;
-      if (filterType === 'out_of_stock' && !p.isOutOfStock) return false;
-
       return true;
     }).sort((a, b) => {
       if (sortBy === 'name') return a.name.localeCompare(b.name, 'tr');
@@ -328,7 +321,21 @@ export default function StockDetailReport() {
       if (sortBy === 'stock_asc') return a.finalStock - b.finalStock;
       return 0;
     });
-  }, [products, templates, stockClassification, subClassification, searchTerm, selectedCategory, selectedBrand, filterType, sortBy]);
+  }, [products, templates, stockClassification, subClassification, searchTerm, selectedCategory, selectedBrand, sortBy]);
+
+  const statusCounts = React.useMemo(() => ({
+    all: baseProducts.length,
+    broken: baseProducts.filter(p => p.hasBrokenSize).length,
+    critical: baseProducts.filter(p => p.isCritical).length,
+    out_of_stock: baseProducts.filter(p => p.isOutOfStock).length,
+  }), [baseProducts]);
+
+  const processedProducts = React.useMemo(() => baseProducts.filter(p => {
+    if (filterType === 'broken') return p.hasBrokenSize;
+    if (filterType === 'critical') return p.isCritical;
+    if (filterType === 'out_of_stock') return p.isOutOfStock;
+    return true;
+  }), [baseProducts, filterType]);
 
   // Expand / collapse all helpers
   const areAllExpanded = React.useMemo(() => {
@@ -530,14 +537,14 @@ export default function StockDetailReport() {
 
         <!-- Footer -->
         <div style="margin-top: 14px; border-top: 1px solid #cbd5e1; padding-top: 6px; font-size: 8px; color: #94a3b8; display: flex; justify-content: space-between;">
-          <span>ProERP Ayakkabı & Envanter Yönetimi</span>
+          <span>DMR Nexus Ayakkabı & Envanter Yönetimi</span>
           <span>Yazdırıldı: ${new Date().toLocaleString('tr-TR')}</span>
         </div>
 
       </div>
     `;
 
-    printHtml(html, { title: 'ProERP Stok Detay Raporu' });
+    printHtml(html, { title: 'DMR Nexus Stok Detay Raporu' });
   };
 
   const handleExportExcel = () => {
@@ -635,36 +642,24 @@ export default function StockDetailReport() {
 
   return (
     <div className="space-y-4" id="stock-detail-report-container">
-      {/* ════════════════════════════════════════════════════════════════
-          1. SAYFA BAŞLIĞI VE HIZLI EYLEMLER
-         ════════════════════════════════════════════════════════════════ */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-1 border-b border-slate-200 dark:border-slate-700/80 dark:border-slate-800/80">
-        <div>
-          <div className="flex items-center gap-2 mb-0.5">
-            <span className="text-[10px] font-black uppercase tracking-widest text-indigo-700 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded">
-              Envanter & Varyant Dağılımı
-            </span>
-            <span className="text-slate-300">•</span>
-            <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-              {processedProducts.length} Stok Listeleniyor
-            </span>
-          </div>
-          <h2 className="text-xl font-black text-slate-900 dark:text-slate-100 tracking-tight uppercase">
-            Stok Detay & Asorti Raporu
-          </h2>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2">
+      <PageHeader
+        title="Stok Detay ve Asorti Raporu"
+        subtitle="Envanter, varyant ve beden dağılımını inceleyin"
+        badge={`${processedProducts.length} stok listeleniyor`}
+        icon={Package}
+        iconColor="indigo"
+        actions={<div className="flex flex-wrap items-center gap-2">
           {/* Yoğunluk Switcher */}
-          <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-0.5 rounded-xl border border-slate-200 dark:border-slate-700">
+          <div role="group" aria-label="Satır yoğunluğu" className="flex items-center bg-surface-raised p-0.5 rounded-control border border-line">
             <button
               type="button"
               onClick={() => setRowDensity('compact')}
+              aria-pressed={rowDensity === 'compact'}
               className={cn(
-                "px-2.5 py-1.5 rounded-lg text-[11px] font-black uppercase tracking-wider transition-all flex items-center gap-1.5",
+                "px-2.5 py-1.5 rounded-control text-xs font-bold transition-all flex items-center gap-1.5",
                 rowDensity === 'compact'
-                  ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-xs"
-                  : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-100"
+                  ? "bg-surface-active text-fg-inverted shadow-card"
+                  : "text-fg-muted hover:bg-surface-hover hover:text-fg-strong"
               )}
               title="Kompakt Tasarım (Ekrana maksimum satır sığdırır)"
             >
@@ -674,11 +669,12 @@ export default function StockDetailReport() {
             <button
               type="button"
               onClick={() => setRowDensity('normal')}
+              aria-pressed={rowDensity === 'normal'}
               className={cn(
-                "px-2.5 py-1.5 rounded-lg text-[11px] font-black uppercase tracking-wider transition-all flex items-center gap-1.5",
+                "px-2.5 py-1.5 rounded-control text-xs font-bold transition-all flex items-center gap-1.5",
                 rowDensity === 'normal'
-                  ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-xs"
-                  : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-100"
+                  ? "bg-surface-active text-fg-inverted shadow-card"
+                  : "text-fg-muted hover:bg-surface-hover hover:text-fg-strong"
               )}
               title="Standart Tasarım"
             >
@@ -688,249 +684,102 @@ export default function StockDetailReport() {
           </div>
 
           {/* Sync Button */}
-          <button 
-            type="button"
+          <Button
+            variant="secondary"
             onClick={handleManualSync}
-            disabled={isSyncing}
-            className={cn(
-              "flex items-center gap-1.5 px-3 py-1.5 border rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-2xs",
-              syncSuccess 
-                ? "bg-emerald-50 border-emerald-300 text-emerald-700" 
-                : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:bg-slate-800/50"
-            )}
+            loading={isSyncing}
+            icon={<RefreshCw className="w-3.5 h-3.5" aria-hidden="true" />}
+            className={syncSuccess ? 'text-success' : undefined}
             title="Model ve varyant stoklarını asorti oranlarına göre eşitle / onar"
           >
-            <RefreshCw className={cn("w-3.5 h-3.5", isSyncing && "animate-spin text-indigo-600", syncSuccess && "text-emerald-600")} />
-            <span className="hidden sm:inline">{isSyncing ? "Eşitleniyor..." : syncSuccess ? "Eşitlendi ✓" : "Stokları Onar"}</span>
-          </button>
+            <span>{isSyncing ? "Eşitleniyor..." : syncSuccess ? "Eşitlendi ✓" : "Stokları Onar"}</span>
+          </Button>
 
           {/* Expand/Collapse All */}
-          <button 
-            type="button"
+          <Button
+            variant="secondary"
             onClick={toggleExpandAll}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-slate-50 dark:bg-slate-800/50 transition-all shadow-2xs"
             title={areAllExpanded ? "Tüm modellerin alt detayını daralt" : "Tüm modellerin alt detayını genişlet"}
           >
             {areAllExpanded ? (
               <>
-                <Minimize2 className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
+                <Minimize2 className="w-3.5 h-3.5" />
                 <span>Tümünü Daralt</span>
               </>
             ) : (
               <>
-                <Maximize2 className="w-3.5 h-3.5 text-indigo-600" />
+                <Maximize2 className="w-3.5 h-3.5" />
                 <span>Tümünü Genişlet</span>
               </>
             )}
-          </button>
+          </Button>
 
           {/* Excel Export */}
-          <button 
-            type="button"
+          <Button
+            variant="secondary"
             onClick={handleExportExcel}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-sm active:scale-95 cursor-pointer"
             title="Stok ve varyant detaylarını Excel / CSV formatında indirin"
           >
             <FileDown className="w-3.5 h-3.5" /> 
             <span>Excel'e Aktar</span>
-          </button>
+          </Button>
 
           {/* Print Report */}
-          <button 
-            type="button"
+          <Button
+            variant="primary"
             onClick={handlePrint}
-            className="flex items-center gap-1.5 px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-sm active:scale-95 cursor-pointer"
           >
             <Printer className="w-3.5 h-3.5" /> 
             <span>Yazdır / PDF</span>
-          </button>
-        </div>
-      </div>
+          </Button>
+        </div>}
+      />
 
       {/* ════════════════════════════════════════════════════════════════
           2. NET VE BELİRGİN KRİTER SEÇİCİ: MAMÜL vs MAMÜL DIŞI
          ════════════════════════════════════════════════════════════════ */}
-      <div className="bg-slate-900 text-white p-3 sm:p-3.5 rounded-2xl shadow-sm space-y-2.5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400 bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-700">
-              Stok Kriteri
-            </span>
-            <span className="text-xs font-bold text-slate-300">
-              Görüntülenecek Stok Sınıfını Seçin:
-            </span>
+      <div className="space-y-3 rounded-card border border-line bg-surface p-3 shadow-card">
+        <div className="flex flex-wrap items-start justify-between gap-2">
+          <div>
+            <h3 className="text-sm font-bold text-fg-strong">Stok sınıfı</h3>
+            <p className="text-xs text-fg-muted">Görüntülenecek stok grubunu seçin.</p>
           </div>
-
-          <span className="text-[11px] font-mono text-slate-400 hidden sm:inline-block">
-            {stockClassification === 'all' 
-              ? 'Tüm kayıtlar görüntüleniyor' 
-              : stockClassification === 'mamul' 
-                ? 'Sadece ayakkabı & bitmiş mamüller filtrelendi' 
-                : 'Yalnızca hammadde, yarı mamül & aksesuarlar filtrelendi'}
+          <span className="text-xs text-fg-muted">
+            {stockClassification === 'all'
+              ? 'Tüm kayıtlar görüntüleniyor'
+              : stockClassification === 'mamul'
+                ? 'Bitmiş mamuller görüntüleniyor'
+                : 'Hammadde, yarı mamul ve aksesuarlar görüntüleniyor'}
           </span>
         </div>
-
-        {/* 3'lü Ana Kriter Düğmeleri */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-          {/* TÜM STOKLAR */}
-          <button
-            type="button"
-            onClick={() => {
-              setStockClassification('all');
-              setSubClassification('all');
-            }}
-            className={cn(
-              "py-2.5 px-3.5 rounded-xl text-left transition-all border flex items-center justify-between cursor-pointer",
-              stockClassification === 'all'
-                ? "bg-indigo-600 border-indigo-400 text-white shadow-md ring-2 ring-indigo-400/40"
-                : "bg-slate-800/80 hover:bg-slate-800 border-slate-700 text-slate-300 hover:text-white"
-            )}
-          >
-            <div className="flex items-center gap-2.5 min-w-0">
-              <div className={cn(
-                "w-7 h-7 rounded-lg flex items-center justify-center shrink-0",
-                stockClassification === 'all' ? "bg-white dark:bg-slate-900/20 text-white" : "bg-slate-700 text-slate-400"
-              )}>
-                <Layers className="w-4 h-4" />
-              </div>
-              <div className="truncate">
-                <div className="text-xs font-black uppercase tracking-wider">Tüm Stoklar</div>
-                <div className="text-[10px] text-slate-300/80">Mamül + Mamül Dışı</div>
-              </div>
-            </div>
-            <span className={cn(
-              "px-2 py-0.5 rounded-md font-mono text-xs font-black shrink-0",
-              stockClassification === 'all' ? "bg-white dark:bg-slate-900 text-indigo-900" : "bg-slate-700 text-slate-300"
-            )}>
-              {classificationCounts.total}
-            </span>
-          </button>
-
-          {/* SADECE MAMÜLLER */}
-          <button
-            type="button"
-            onClick={() => {
-              setStockClassification('mamul');
-              setSubClassification('all');
-            }}
-            className={cn(
-              "py-2.5 px-3.5 rounded-xl text-left transition-all border flex items-center justify-between cursor-pointer",
-              stockClassification === 'mamul'
-                ? "bg-indigo-600 border-indigo-400 text-white shadow-md ring-2 ring-indigo-400/40"
-                : "bg-slate-800/80 hover:bg-slate-800 border-slate-700 text-slate-300 hover:text-white"
-            )}
-          >
-            <div className="flex items-center gap-2.5 min-w-0">
-              <div className={cn(
-                "w-7 h-7 rounded-lg flex items-center justify-center shrink-0",
-                stockClassification === 'mamul' ? "bg-white dark:bg-slate-900/20 text-white" : "bg-slate-700 text-indigo-400"
-              )}>
-                <Box className="w-4 h-4" />
-              </div>
-              <div className="truncate">
-                <div className="text-xs font-black uppercase tracking-wider">Mamüller (Bitmiş)</div>
-                <div className="text-[10px] text-slate-300/80">Satılabilir Ürün & Ayakkabı</div>
-              </div>
-            </div>
-            <span className={cn(
-              "px-2 py-0.5 rounded-md font-mono text-xs font-black shrink-0",
-              stockClassification === 'mamul' ? "bg-white dark:bg-slate-900 text-indigo-900" : "bg-slate-700 text-indigo-300"
-            )}>
-              {classificationCounts.mamul}
-            </span>
-          </button>
-
-          {/* MAMÜL DIŞI STOKLAR */}
-          <button
-            type="button"
-            onClick={() => {
-              setStockClassification('mamul_disi');
-            }}
-            className={cn(
-              "py-2.5 px-3.5 rounded-xl text-left transition-all border flex items-center justify-between cursor-pointer",
-              stockClassification === 'mamul_disi'
-                ? "bg-amber-600 border-amber-400 text-white shadow-md ring-2 ring-amber-400/40"
-                : "bg-slate-800/80 hover:bg-slate-800 border-slate-700 text-slate-300 hover:text-white"
-            )}
-          >
-            <div className="flex items-center gap-2.5 min-w-0">
-              <div className={cn(
-                "w-7 h-7 rounded-lg flex items-center justify-center shrink-0",
-                stockClassification === 'mamul_disi' ? "bg-white dark:bg-slate-900/20 text-white" : "bg-slate-700 text-amber-400"
-              )}>
-                <Boxes className="w-4 h-4" />
-              </div>
-              <div className="truncate">
-                <div className="text-xs font-black uppercase tracking-wider">Mamül Dışı Stoklar</div>
-                <div className="text-[10px] text-slate-300/80">Hammadde, Yarı Mamül, Aks.</div>
-              </div>
-            </div>
-            <span className={cn(
-              "px-2 py-0.5 rounded-md font-mono text-xs font-black shrink-0",
-              stockClassification === 'mamul_disi' ? "bg-white dark:bg-slate-900 text-amber-950" : "bg-slate-700 text-amber-300"
-            )}>
-              {classificationCounts.mamulDisi}
-            </span>
-          </button>
-        </div>
-
-        {/* Mamül Dışı Seçildiğinde Açılan Detaylı Alt Tür Kriterleri */}
+        <SegmentedFilter
+          ariaLabel="Stok sınıfı"
+          options={[
+            { key: 'all', label: 'Tüm Stoklar', count: classificationCounts.total, icon: <Layers aria-hidden="true" /> },
+            { key: 'mamul', label: 'Mamuller', count: classificationCounts.mamul, icon: <Box aria-hidden="true" /> },
+            { key: 'mamul_disi', label: 'Mamul Dışı', count: classificationCounts.mamulDisi, icon: <Boxes aria-hidden="true" /> },
+          ]}
+          value={stockClassification}
+          onChange={key => {
+            setStockClassification(key as StockClassification);
+            if (key !== 'mamul_disi') setSubClassification('all');
+          }}
+        />
         {stockClassification === 'mamul_disi' && (
-          <div className="pt-2 border-t border-slate-800 flex flex-wrap items-center gap-1.5">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-amber-300 mr-1 flex items-center gap-1">
-              <Filter className="w-3 h-3" /> Mamül Dışı Türü:
-            </span>
-            <button
-              type="button"
-              onClick={() => setSubClassification('all')}
-              className={cn(
-                "px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all",
-                subClassification === 'all'
-                  ? "bg-amber-500 text-slate-950 font-black shadow-xs"
-                  : "bg-slate-800 text-slate-300 hover:bg-slate-700"
-              )}
-            >
-              Tüm Mamül Dışı ({classificationCounts.mamulDisi})
-            </button>
-            <button
-              type="button"
-              onClick={() => setSubClassification('semi_finished')}
-              className={cn(
-                "px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all flex items-center gap-1",
-                subClassification === 'semi_finished'
-                  ? "bg-amber-500 text-slate-950 font-black shadow-xs"
-                  : "bg-slate-800 text-slate-300 hover:bg-slate-700"
-              )}
-            >
-              <Scissors className="w-3 h-3" />
-              Yarı Mamül ({classificationCounts.semiFinished})
-            </button>
-            <button
-              type="button"
-              onClick={() => setSubClassification('raw_material')}
-              className={cn(
-                "px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all flex items-center gap-1",
-                subClassification === 'raw_material'
-                  ? "bg-emerald-500 text-slate-950 font-black shadow-xs"
-                  : "bg-slate-800 text-slate-300 hover:bg-slate-700"
-              )}
-            >
-              <Layers className="w-3 h-3" />
-              Hammadde ({classificationCounts.rawMaterial})
-            </button>
-            <button
-              type="button"
-              onClick={() => setSubClassification('accessory')}
-              className={cn(
-                "px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all flex items-center gap-1",
-                subClassification === 'accessory'
-                  ? "bg-purple-400 text-slate-950 font-black shadow-xs"
-                  : "bg-slate-800 text-slate-300 hover:bg-slate-700"
-              )}
-            >
-              <Tag className="w-3 h-3" />
-              Aksesuar & Sarf ({classificationCounts.accessory})
-            </button>
+          <div className="flex flex-wrap items-center gap-2 border-t border-line pt-3">
+            <span className="text-label font-bold text-fg-muted">Mamul dışı türü</span>
+            <SegmentedFilter
+              ariaLabel="Mamul dışı türü"
+              size="sm"
+              options={[
+                { key: 'all', label: 'Tümü', count: classificationCounts.mamulDisi },
+                { key: 'semi_finished', label: 'Yarı Mamul', count: classificationCounts.semiFinished, icon: <Scissors aria-hidden="true" /> },
+                { key: 'raw_material', label: 'Hammadde', count: classificationCounts.rawMaterial, icon: <Layers aria-hidden="true" /> },
+                { key: 'accessory', label: 'Aksesuar ve Sarf', count: classificationCounts.accessory, icon: <Tag aria-hidden="true" /> },
+              ]}
+              value={subClassification}
+              onChange={key => setSubClassification(key as SubClassification)}
+            />
           </div>
         )}
       </div>
@@ -938,124 +787,82 @@ export default function StockDetailReport() {
       {/* ════════════════════════════════════════════════════════════════
           3. ARAMA VE İKİNCİL FİLTRELEME ÇUBUĞU
          ════════════════════════════════════════════════════════════════ */}
-      <div className="bg-white dark:bg-slate-900 p-3 rounded-2xl border border-slate-200 dark:border-slate-700/90 shadow-2xs space-y-2.5">
-        <div className="flex flex-col md:flex-row gap-2.5 items-center justify-between">
-          {/* Arama Kutusu */}
-          <div className="relative w-full md:max-w-md">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
-            <input 
-              type="text" 
-              placeholder="MODEL ADI, KOD, RENK, RAF VEYA BARKOD ARA..." 
-              className="w-full pl-9 pr-8 py-2 rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 placeholder:text-slate-400 transition-all"
+      <div className="space-y-3 rounded-card border border-line bg-surface p-3 shadow-card">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center">
+          <div className="relative min-w-0 flex-1">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-fg-muted" aria-hidden="true" />
+            <input
+              type="search"
+              aria-label="Stoklarda ara"
+              placeholder="Model adı, kod, renk, raf veya barkod ara"
+              className={cn(controlClass(), 'pl-9 pr-9')}
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={event => setSearchTerm(event.target.value)}
             />
             {searchTerm && (
-              <button 
+              <button
+                type="button"
+                aria-label="Aramayı temizle"
                 onClick={() => setSearchTerm('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs font-bold"
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-control px-2 py-1 text-fg-muted hover:bg-surface-hover hover:text-fg-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
-                ✕
+                ×
               </button>
             )}
           </div>
-
-          {/* Hızlı Filtre Dropdown'ları */}
-          <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
+          <div className="flex flex-wrap items-center gap-2">
             {categories.length > 0 && (
               <select
+                aria-label="Kategori"
                 value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl px-2.5 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                onChange={event => setSelectedCategory(event.target.value)}
+                className={cn(controlClass(), 'w-auto min-w-36')}
               >
                 <option value="all">Tüm Kategoriler ({categories.length})</option>
-                {categories.map(c => <option key={c} value={c}>{c}</option>)}
+                {categories.map(category => <option key={category} value={category}>{category}</option>)}
               </select>
             )}
-
             {brands.length > 0 && (
               <select
+                aria-label="Marka"
                 value={selectedBrand}
-                onChange={(e) => setSelectedBrand(e.target.value)}
-                className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl px-2.5 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                onChange={event => setSelectedBrand(event.target.value)}
+                className={cn(controlClass(), 'w-auto min-w-32')}
               >
                 <option value="all">Tüm Markalar ({brands.length})</option>
-                {brands.map(b => <option key={b} value={b}>{b}</option>)}
+                {brands.map(brand => <option key={brand} value={brand}>{brand}</option>)}
               </select>
             )}
-
             <select
+              aria-label="Sıralama"
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as any)}
-              className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl px-2.5 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+              onChange={event => setSortBy(event.target.value as typeof sortBy)}
+              className={cn(controlClass(), 'w-auto min-w-36')}
             >
-              <option value="name">Sırala: İsim (A-Z)</option>
-              <option value="code">Sırala: Ürün Kodu</option>
-              <option value="stock_desc">Sırala: Stok (Çoktan Aza)</option>
-              <option value="stock_asc">Sırala: Stok (Azdan Çoğa)</option>
+              <option value="name">İsim (A-Z)</option>
+              <option value="code">Ürün Kodu</option>
+              <option value="stock_desc">Stok (Çoktan Aza)</option>
+              <option value="stock_asc">Stok (Azdan Çoğa)</option>
             </select>
           </div>
         </div>
-
-        {/* Durum Rozetleri (Kırık, Kritik, Tükendi) */}
-        <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-slate-100 dark:border-slate-800">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mr-1 flex items-center gap-1">
-            <Filter className="w-3 h-3" /> Durum:
+        <div className="flex flex-wrap items-center gap-2 border-t border-line pt-3">
+          <span className="flex items-center gap-1 text-label font-bold text-fg-muted"><Filter className="h-3.5 w-3.5" aria-hidden="true" /> Durum</span>
+          <SegmentedFilter
+            ariaLabel="Stok durumu"
+            size="sm"
+            options={[
+              { key: 'all', label: 'Tümü', count: statusCounts.all },
+              { key: 'broken', label: 'Kırık Beden', count: statusCounts.broken, icon: <AlertTriangle aria-hidden="true" /> },
+              { key: 'critical', label: 'Kritik Stok', count: statusCounts.critical },
+              { key: 'out_of_stock', label: 'Tükenenler', count: statusCounts.out_of_stock },
+            ]}
+            value={filterType}
+            onChange={key => setFilterType(key as typeof filterType)}
+          />
+          <span className="ml-auto text-xs font-semibold text-fg-muted">
+            Toplam Stok: <strong className="font-mono text-fg-strong">{summaryStats.totalStock}</strong> adet/çift
           </span>
-
-          <button
-            onClick={() => setFilterType('all')}
-            className={cn(
-              "px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all",
-              filterType === 'all' 
-                ? "bg-slate-900 text-white shadow-xs" 
-                : "bg-slate-100 dark:bg-slate-800 text-slate-600 hover:bg-slate-200"
-            )}
-          >
-            Tümü ({processedProducts.length})
-          </button>
-
-          <button
-            onClick={() => setFilterType('broken')}
-            className={cn(
-              "px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all flex items-center gap-1",
-              filterType === 'broken' 
-                ? "bg-rose-600 text-white shadow-xs" 
-                : "bg-slate-100 dark:bg-slate-800 text-slate-600 hover:bg-slate-200"
-            )}
-          >
-            <AlertTriangle className="w-3 h-3 text-rose-500" />
-            Kırık Bedenler ({summaryStats.brokenColorsCount})
-          </button>
-
-          <button
-            onClick={() => setFilterType('critical')}
-            className={cn(
-              "px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all",
-              filterType === 'critical' 
-                ? "bg-amber-600 text-white shadow-xs" 
-                : "bg-slate-100 dark:bg-slate-800 text-slate-600 hover:bg-slate-200"
-            )}
-          >
-            Kritik Stok ({summaryStats.criticalCount})
-          </button>
-
-          <button
-            onClick={() => setFilterType('out_of_stock')}
-            className={cn(
-              "px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all",
-              filterType === 'out_of_stock' 
-                ? "bg-slate-800 text-white shadow-xs" 
-                : "bg-slate-100 dark:bg-slate-800 text-slate-600 hover:bg-slate-200"
-            )}
-          >
-            Tükenenler ({summaryStats.outOfStockCount})
-          </button>
-
-          {/* Aktif Liste Özeti */}
-          <div className="ml-auto text-[11px] font-mono font-bold text-slate-500 dark:text-slate-400 hidden sm:block">
-            Toplam Stok: <span className="text-emerald-700 font-black">{summaryStats.totalStock}</span> Adet/Çift
-          </div>
         </div>
       </div>
 

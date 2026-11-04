@@ -179,7 +179,7 @@ function addColumnsSheet(ws: any): void {
 export async function downloadTemplate(ctx: TemplateContext = {}): Promise<void> {
   const ExcelJS = await loadExcelJs();
   const wb = new ExcelJS.Workbook();
-  wb.creator = 'ProERP';
+  wb.creator = 'DMR Nexus';
   wb.created = new Date();
 
   // 1) Veri girişi yapılacak boş sayfa.
@@ -235,7 +235,7 @@ export async function downloadTemplate(ctx: TemplateContext = {}): Promise<void>
   (ctx.templates || []).forEach((t) => tmplSheet.addRow({ name: t.name, items: (t.items || []).map((i) => `${i.size}(${i.quantity})`).join(' ') }));
 
   const buffer = await wb.xlsx.writeBuffer();
-  triggerDownload(new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), 'ProERP_Stok_Aktarim_Sablonu.xlsx');
+  triggerDownload(new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), 'DMR Nexus_Stok_Aktarim_Sablonu.xlsx');
 }
 
 /* ------------------------------------------------------------------ */

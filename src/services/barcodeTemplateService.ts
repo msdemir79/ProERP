@@ -275,7 +275,7 @@ export const barcodeTemplateService = {
           <!-- 1. Header -->
           ${config.showCompanyHeader ? `
             <div class="header-row">
-              <span class="company-title">${config.companyHeaderText || data.companyName || 'PROERP AYAKKABI SANAYİ'}</span>
+              <span class="company-title">${config.companyHeaderText || data.companyName || 'DMR NEXUS AYAKKABI SANAYİ'}</span>
               ${config.showBoxSerial && data.boxNumber ? `
                 <div style="background: #000; color: #fff; font-weight: 900; font-size: ${isSmallLabel ? '7pt' : '9pt'}; padding: 0.8mm 2mm; border-radius: 1mm;">
                   KOLİ: ${data.boxNumber} / ${data.totalBoxes || 1}
@@ -417,7 +417,7 @@ export const barcodeTemplateService = {
           <!-- 7. Footer Note -->
           ${config.showCustomNote ? `
             <div class="footer-note">
-              ${config.customNoteText || data.customNote || 'PROERP STANDARD THERMAL BARCODE SYSTEM'}
+              ${config.customNoteText || data.customNote || 'DMR NEXUS STANDARD THERMAL BARCODE SYSTEM'}
             </div>
           ` : ''}
         </div>

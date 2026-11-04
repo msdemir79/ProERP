@@ -239,6 +239,7 @@ export default function DataGrid<T>({
                     {selectable && (
                       <input
                         type="checkbox"
+                        aria-label={`Kayıt ${id} seç`}
                         checked={selectedSet.has(id)}
                         onChange={() => toggleOne(id)}
                         onClick={(e) => e.stopPropagation()}
@@ -288,36 +289,44 @@ export default function DataGrid<T>({
                 <th className={cn('w-10', headPad)}>
                   <input
                     type="checkbox"
+                    aria-label="Görünen tüm kayıtları seç"
                     checked={filtered.length > 0 && filtered.every((r) => selectedSet.has(getKey(r)))}
                     onChange={toggleAll}
                     className={cn('w-3.5 h-3.5', checkboxClass)}
                   />
                 </th>
               )}
-              {columns.map((col) => (
-                <th
+              {columns.map((col) => {
+                const content = <>
+                  {col.title}
+                  {col.filterable !== false && <Filter aria-hidden="true" className="w-3 h-3 text-fg-muted opacity-60" />}
+                  {sort.key === col.key &&
+                    (sort.dir === 'asc' ? (
+                      <ChevronUp aria-hidden="true" className="w-3.5 h-3.5 text-brand" />
+                    ) : (
+                      <ChevronDown aria-hidden="true" className="w-3.5 h-3.5 text-brand" />
+                    ))}
+                </>;
+                return <th
                   key={col.key}
+                  scope="col"
+                  aria-sort={col.sortable === false ? undefined : sort.key === col.key ? (sort.dir === 'asc' ? 'ascending' : 'descending') : 'none'}
                   style={col.width ? { width: col.width } : undefined}
-                  onClick={() => toggleSort(col)}
-                  className={cn(
-                    headPad,
-                    'text-xs font-bold text-fg-muted whitespace-nowrap',
-                    col.align ? ALIGN[col.align] : 'text-left',
-                    col.sortable !== false && 'cursor-pointer select-none hover:text-fg-strong'
-                  )}
+                  className={cn(headPad, 'text-xs font-bold text-fg-muted whitespace-nowrap', col.align ? ALIGN[col.align] : 'text-left')}
                 >
-                  <span className="inline-flex items-center gap-1">
-                    {col.title}
-                    <Filter className="w-3 h-3 text-fg-muted opacity-60" />
-                    {sort.key === col.key &&
-                      (sort.dir === 'asc' ? (
-                        <ChevronUp className="w-3.5 h-3.5 text-brand" />
-                      ) : (
-                        <ChevronDown className="w-3.5 h-3.5 text-brand" />
-                      ))}
-                  </span>
-                </th>
-              ))}
+                  {col.sortable === false ? (
+                    <span className="inline-flex items-center gap-1">{content}</span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => toggleSort(col)}
+                      className="inline-flex items-center gap-1 cursor-pointer select-none hover:text-fg-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+                    >
+                      {content}
+                    </button>
+                  )}
+                </th>;
+              })}
               {rowActions && <th className={cn('w-10', headPad)} />}
             </tr>
             <tr className="border-b border-line bg-surface">
@@ -330,6 +339,7 @@ export default function DataGrid<T>({
                     <div className="relative">
                       <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-fg-muted pointer-events-none" />
                       <input
+                        aria-label={`${col.title} sütununda ara`}
                         value={filters[col.key] || ''}
                         onChange={(e) => setFilters((f) => ({ ...f, [col.key]: e.target.value }))}
                         placeholder="Ara"
@@ -382,6 +392,7 @@ export default function DataGrid<T>({
                       <td className={cellPad} onClick={(e) => e.stopPropagation()}>
                         <input
                           type="checkbox"
+                          aria-label={`Kayıt ${id} seç`}
                           checked={selectedSet.has(id)}
                           onChange={() => toggleOne(id)}
                           className={cn('w-3.5 h-3.5', checkboxClass)}

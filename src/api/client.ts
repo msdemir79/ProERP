@@ -192,7 +192,12 @@ async function performHttp<T>(path: string, init?: RequestInit): Promise<T> {
   if (!res.ok) {
     // Giriş uçları dışındaki 401 yanıtları "oturum bitti" anlamına gelir.
     if (res.status === 401 && !path.startsWith('/auth/login')) notifyUnauthorized();
-    throw new ApiError(payload?.error || `İstek başarısız (${res.status})`, res.status, payload?.code);
+    const missingOperation = res.status === 404 && path.startsWith('/ops/')
+      && (!payload?.error || payload.error === 'Bilinmeyen API yolu.');
+    const message = missingOperation
+      ? 'Bu işlem sunucuda bulunamadı. Uygulama sunucusunu güncel sürümle yeniden başlatın.'
+      : payload?.error || `İstek başarısız (${res.status})`;
+    throw new ApiError(message, res.status, payload?.code);
   }
   return payload as T;
 }

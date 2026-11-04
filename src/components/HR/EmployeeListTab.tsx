@@ -330,7 +330,7 @@ export default function EmployeeListTab({ employees, onRefresh }: EmployeeListTa
                   </div>
 
                   {/* Department & Wage details */}
-                  <div className="p-2.5 bg-slate-50 dark:bg-slate-800/50/80 rounded-lg border border-slate-100 dark:border-slate-800 space-y-1.5 text-xs">
+                  <div className="p-2.5 bg-slate-50 dark:bg-slate-800/80 rounded-lg border border-slate-100 dark:border-slate-800 space-y-1.5 text-xs">
                     <div className="flex justify-between items-center text-slate-600">
                       <span className="text-[10px] text-slate-500 dark:text-slate-400">Departman:</span>
                       <span className="font-semibold text-slate-800 dark:text-slate-200 text-[11px]">{emp.department}</span>

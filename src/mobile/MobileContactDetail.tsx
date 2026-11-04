@@ -71,7 +71,7 @@ export default function MobileContactDetail({ contact, onClose }: { contact: Con
           <Row icon={Mail} label="E-posta" value={contact.email} href={contact.email ? `mailto:${contact.email}` : undefined} />
           <Row icon={MapPin} label="İl/İlçe" value={[contact.city, contact.district].filter(Boolean).join(' / ')} />
           <Row icon={MapPin} label="Adres" value={contact.address} />
-          {contact.paymentTermDays !== undefined && <Row label="Vade" value={`${contact.paymentTermDays} gün`} />}
+          {contact.paymentTermDays != null && <Row label="Vade" value={`${contact.paymentTermDays} gün`} />}
           {contact.taxNumber && <Row label="Vergi No" value={contact.taxNumber} />}
         </div>
 

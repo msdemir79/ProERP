@@ -102,7 +102,7 @@ export default function BarcodeCenter() {
   // --- Label content ---
   const [showPrice, setShowPrice] = useState<boolean>(true);
   const [showBoxSerial, setShowBoxSerial] = useState<boolean>(true);
-  const [companyHeader, setCompanyHeader] = useState<string>('ProERP SHOES');
+  const [companyHeader, setCompanyHeader] = useState<string>('DMR Nexus SHOES');
   const [showImage, setShowImage] = useState<boolean>(true);
   const [customImage, setCustomImage] = useState<string | null>(null);
   const [imageSize, setImageSize] = useState<'sm' | 'md' | 'lg'>('md');

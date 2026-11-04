@@ -43,7 +43,7 @@ export default function ReceiptPrintPreviewModal({ receipt, companySettings, onC
               ) : null}
               <div>
                 <h2 className="text-xl font-black text-gray-900 uppercase tracking-wide">
-                  {companySettings?.companyTitle || companySettings?.companyName || 'PRO ERP AYAKKABI SAN. TİC. LTD. ŞTİ.'}
+                  {companySettings?.companyTitle || companySettings?.companyName || 'DMR Nexus'}
                 </h2>
                 <p className="text-xs text-gray-600 mt-1">{companySettings?.address || 'İkitelli OSB Aykosan Sanayi Sitesi 4. Ada B Blok No:12 Başakşehir / İstanbul'}</p>
                 <p className="text-xs text-gray-600">Vergi Dairesi: {companySettings?.taxOffice || 'İkitelli V.D.'} - Vergi No: {companySettings?.taxNumber || '7320491820'}</p>

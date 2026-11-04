@@ -18,16 +18,16 @@ export function CorporateModernTemplate({
     ? 'İPTAL EDİLMİŞ FATURA' 
     : (isSales ? 'e-ARŞİV FATURA' : 'ALIŞ FATURASI');
 
-  const compName = companySettings?.companyName || 'ProERP Ayakkabı';
-  const compTitle = companySettings?.companyTitle || companySettings?.companyName || 'PROERP AYAKKABI SAN. VE TİC. LTD. ŞTİ.';
+  const compName = companySettings?.companyName || 'DMR Nexus';
+  const compTitle = companySettings?.companyTitle || companySettings?.companyName || 'DMR Nexus';
   const compLogo = companySettings?.logo;
   const compAddress = companySettings?.address || 'Organize Sanayi Bölgesi 12. Cadde No: 45 / Başakşehir / İSTANBUL';
   const compTaxOffice = companySettings?.taxOffice || 'İkitelli V.D.';
   const compTaxNumber = companySettings?.taxNumber || '7340592811';
   const compTradeReg = companySettings?.tradeRegistryNo || '948123-5';
   const compPhone = companySettings?.phone || '(0212) 555 01 99';
-  const compEmail = companySettings?.email || 'muhasebe@proerp.com';
-  const compWebsite = companySettings?.website || 'www.proerp.com.tr';
+  const compEmail = companySettings?.email || '';
+  const compWebsite = companySettings?.website || '';
   const compBank = companySettings?.bankName || 'T.C. Ziraat Bankası - İkitelli Şubesi';
   const compIban = companySettings?.iban || 'TR33 0001 0002 0003 0004 0005 01';
 
@@ -407,7 +407,7 @@ export function CorporateModernTemplate({
         <div className="space-y-1">
           <div className="font-bold text-indigo-950 uppercase">Düzenleyen / Teslim Eden</div>
           <div className="h-14 flex flex-col items-center justify-center font-serif italic text-slate-500 dark:text-slate-400 border border-dashed border-indigo-200 rounded p-1 bg-indigo-50/20">
-            <span className="font-sans font-bold text-[9px] text-indigo-900">ProERP Muhasebe Departmanı</span>
+            <span className="font-sans font-bold text-[9px] text-indigo-900">DMR Nexus Muhasebe Departmanı</span>
             <span className="text-[8px] text-slate-400">5070 Sayılı Kanun Uyarınca e-İmzalıdır</span>
           </div>
           <div className="text-[9px] text-slate-400">İmza / Kaşe</div>

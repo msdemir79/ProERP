@@ -16,8 +16,6 @@ import {
   Moon,
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
-import { api } from '../api/client';
-import { useApiQuery } from '../hooks/useApiQuery';
 import { cn } from '../lib/utils';
 import { useAuth } from '../context/AuthContext';
 import { NAV, leavesOf, moduleForPath, labelForPath, type NavEntry, type NavLeaf } from '../lib/navConfig';
@@ -28,6 +26,8 @@ import CameraBarcodeScannerModal from './Common/CameraBarcodeScannerModal';
 import GlobalSearch from './Common/GlobalSearch';
 import NotificationBell from './Common/NotificationBell';
 import UserMenu from './Common/UserMenu';
+
+const BRAND_NAME = 'DMR Nexus';
 
 export default function Layout() {
   const { actualTheme, setTheme } = useTheme();
@@ -55,10 +55,6 @@ export default function Layout() {
     stopImpersonation,
   } = useAuth();
 
-  const appSettings = useApiQuery(() => api.settings.get('global_settings'), [], ['settings']);
-  const companyLogo = appSettings?.company?.logo;
-  const companyName = appSettings?.company?.companyName || 'ProERP';
-
   const currentModule = moduleForPath(pathname);
   const isCurrentModuleAllowed = hasPermission(currentModule, 'view');
   const pageTitle = labelForPath(pathname);
@@ -66,8 +62,8 @@ export default function Layout() {
   // Sekme başlığı aktif sayfayı yansıtsın: çok sekmeli kullanımda ve tarayıcı
   // geçmişinde hangi ekranın açık olduğu okunabilir olur.
   useEffect(() => {
-    document.title = pageTitle ? `${pageTitle} · ${companyName}` : companyName;
-  }, [pageTitle, companyName]);
+    document.title = pageTitle ? `${pageTitle} · ${BRAND_NAME}` : BRAND_NAME;
+  }, [pageTitle]);
 
   const isLeafActive = (href: string) =>
     href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(href + '/');
@@ -89,26 +85,13 @@ export default function Layout() {
   const entryAllowed = (entry: NavEntry) => hasPermission(entry.module, 'view');
   const leafAllowed = (leaf: NavLeaf) => hasPermission(leaf.module, 'view');
 
-  const Logo = ({ size = 'md' }: { size?: 'md' | 'sm' }) =>
-    companyLogo ? (
-      <div
-        className={cn(
-          'rounded-lg bg-white p-0.5 shrink-0 flex items-center justify-center overflow-hidden border border-slate-700',
-          size === 'md' ? 'w-8 h-8' : 'w-7 h-7'
-        )}
-      >
-        <img src={companyLogo} alt={companyName} className="max-w-full max-h-full object-contain" />
-      </div>
-    ) : (
-      <div
-        className={cn(
-          'bg-indigo-600 rounded-lg flex items-center justify-center font-black text-white shrink-0 border border-indigo-400/20',
-          size === 'md' ? 'w-8 h-8 text-xs' : 'w-7 h-7 text-xs'
-        )}
-      >
-        P
-      </div>
-    );
+  const Logo = ({ size = 'md' }: { size?: 'md' | 'sm' }) => (
+    <img
+      src="/brand/dmr-nexus-icon.png"
+      alt={BRAND_NAME}
+      className={cn('shrink-0 object-contain', size === 'md' ? 'w-8 h-8' : 'w-7 h-7')}
+    />
+  );
 
   /* ---------------------------------- Desktop sidebar --------------------------------- */
   const renderDesktopEntry = (entry: NavEntry) => {
@@ -293,7 +276,7 @@ export default function Layout() {
           <div className={cn('flex items-center gap-2.5 min-w-0 overflow-hidden', isCollapsed && 'hidden')}>
             <Logo />
             <div className="flex flex-col min-w-0">
-              <span className="text-white font-black tracking-tight text-sm leading-none truncate">{companyName}</span>
+              <span className="text-white font-black tracking-tight text-sm leading-none truncate">{BRAND_NAME}</span>
               <span className="text-[10px] text-slate-400 font-semibold leading-none mt-1 truncate">
                 Ayakkabı Üretim & ERP
               </span>
@@ -335,7 +318,7 @@ export default function Layout() {
         <div className="h-14 px-4 flex items-center justify-between border-b border-slate-800 shrink-0">
           <div className="flex items-center gap-2.5 min-w-0">
             <Logo size="sm" />
-            <span className="text-white font-bold tracking-tight text-sm truncate">{companyName}</span>
+            <span className="text-white font-bold tracking-tight text-sm truncate">{BRAND_NAME}</span>
           </div>
           <button
             onClick={() => setIsMobileMenuOpen(false)}

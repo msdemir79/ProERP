@@ -360,7 +360,7 @@ const DesignerPreviewPanel: React.FC<DesignerPreviewPanelProps> = ({
                 {/* 7. Footer Note */}
                 {showCustomNote && (
                   <div className="text-[6.5px] font-bold text-center border-t border-black pt-0.5 mt-0.5 uppercase">
-                    {customNoteText || 'PROERP STANDART TERMAL BARKOD'}
+                    {customNoteText || 'DMR NEXUS STANDART TERMAL BARKOD'}
                   </div>
                 )}
               </div>

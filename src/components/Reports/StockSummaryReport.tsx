@@ -1,7 +1,6 @@
 import React from 'react';
 import { api } from '../../api/client';
 import { useApiQuery } from '../../hooks/useApiQuery';
-import { inventoryService } from '../../services/inventoryService';
 import { Search, AlertTriangle, Printer, FileDown, Palette } from 'lucide-react';
 import DataGrid, { StatusPill, type GridColumn } from '../Common/DataGrid';
 import { cn } from '../../lib/utils';
@@ -31,11 +30,6 @@ export default function StockSummaryReport() {
   const products = useApiQuery(() => api.products.list(), [], ['products']);
   const templates = useApiQuery(() => api.assortmentTemplates.list(), [], ['assortmentTemplates']);
   const [searchTerm, setSearchTerm] = React.useState('');
-
-  // Varyant stoklarını ürün stoğuyla eşitle (detay raporu ile aynı davranış)
-  React.useEffect(() => {
-    inventoryService.syncProductVariantStocks().catch(err => console.error('Stok senkronizasyon hatası:', err));
-  }, []);
 
   const rows = React.useMemo<SummaryRow[]>(() => {
     if (!products) return [];

@@ -96,7 +96,7 @@ export default function UserSwitcherModal({ isOpen, onClose }: UserSwitcherModal
                     ? 'bg-indigo-50/80 border-indigo-300 shadow-xs ring-1 ring-indigo-500/30'
                     : isActive
                     ? 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 hover:border-slate-300 hover:bg-slate-50 dark:bg-slate-800/50'
-                    : 'bg-slate-50 dark:bg-slate-800/50/60 border-slate-200 dark:border-slate-700 opacity-60 cursor-not-allowed'
+                    : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 opacity-60 cursor-not-allowed'
                 }`}
               >
                 <div className="flex items-center gap-3 min-w-0">

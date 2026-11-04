@@ -54,6 +54,7 @@ import AddWorkOrderModal from './Production/AddWorkOrderModal';
 import { RecipeModal } from './Production/RecipeModal';
 import CameraBarcodeScannerModal, { type ScannerMode } from './Common/CameraBarcodeScannerModal';
 import DataGrid, { GridColumn, StatusPill } from './Common/DataGrid';
+import Tabs from './Common/Tabs';
 import DetailPanel from './Common/DetailPanel';
 import { DetailSection, DetailSummary, DetailTiles } from './Common/DetailPanelContent';
 import StatusBadge from './Common/StatusBadge';
@@ -572,6 +573,37 @@ export default function Production() {
     },
   ], [productMap, moldAvailabilityByWo]);
 
+  const pendingProductionOrdersCount = pendingSalesOrders.filter(o => o.hasMissingWorkOrders).length;
+  const productionTabGroups: { key: string; label: string; items: { key: ProductionTab; label: string; icon: React.ReactNode; badge?: React.ReactNode }[] }[] = [
+    {
+      key: 'monitoring', label: 'İzleme', items: [
+        { key: 'line', label: 'Hat Görünümü', icon: <Boxes className="h-4 w-4" /> },
+        { key: 'timeline', label: 'Süreç Akışı', icon: <Clock className="h-4 w-4" /> },
+        { key: 'matrix', label: 'Renk-Beden Matrisi', icon: <LayoutGrid className="h-4 w-4" /> },
+        { key: 'capacity', label: 'Kapasite', icon: <Gauge className="h-4 w-4" /> },
+      ],
+    },
+    {
+      key: 'planning', label: 'Planlama', items: [
+        { key: 'pipeline', label: 'Proses Takibi', icon: <Layers className="h-4 w-4" /> },
+        { key: 'orders_pool', label: 'Sipariş Havuzu', icon: <ShoppingCart className="h-4 w-4" />, badge: pendingProductionOrdersCount > 0 ? <span className="rounded-pill bg-warning-soft px-1.5 py-0.5 text-2xs font-bold text-warning">{pendingProductionOrdersCount}</span> : undefined },
+        { key: 'mrp', label: 'Malzeme İhtiyaç Planı', icon: <RefreshCw className="h-4 w-4" />, badge: (mrpResult?.shortageItemsCount || 0) > 0 ? <span className="rounded-pill bg-danger-soft px-1.5 py-0.5 text-2xs font-bold text-danger">{mrpResult?.shortageItemsCount} eksik</span> : undefined },
+      ],
+    },
+    {
+      key: 'operations', label: 'İşlemler', items: [
+        { key: 'barcode_terminal', label: 'Barkod Terminali', icon: <Barcode className="h-4 w-4" /> },
+        { key: 'recipes', label: 'Reçeteler (BoM)', icon: <Settings2 className="h-4 w-4" /> },
+      ],
+    },
+    {
+      key: 'analysis', label: 'Analiz', items: [
+        { key: 'reports', label: 'Üretim Raporları', icon: <BarChart3 className="h-4 w-4" /> },
+      ],
+    },
+  ];
+  const activeNavGroup = productionTabGroups.find((group) => group.items.some((item) => item.key === activeTab)) || productionTabGroups[0];
+
   return (
     <div className="space-y-6">
       {/* Top Header */}
@@ -694,166 +726,50 @@ export default function Production() {
               Terminali Aç <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-900/10 text-white flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl bg-white text-indigo-900 dark:bg-white/10 dark:text-white flex items-center justify-center">
             <Barcode className="w-5 h-5" />
           </div>
         </div>
       </div>
 
       {/* Main Tab Navigation Bar */}
-      <div className="bg-white dark:bg-slate-900 p-2 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xs flex flex-wrap items-center justify-between gap-2">
-        <div className="flex flex-wrap items-center gap-1">
-          <button
-            onClick={() => setActiveTab('line')}
-            className={cn(
-              "px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2",
-              activeTab === 'line'
-                ? "bg-slate-900 text-white shadow-sm"
-                : "text-slate-600 hover:bg-slate-100 dark:bg-slate-800"
-            )}
-          >
-            <Boxes className="w-4 h-4 text-cyan-400" />
-            Hat Görünümü
-          </button>
-
-          <button
-            onClick={() => setActiveTab('timeline')}
-            className={cn(
-              "px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2",
-              activeTab === 'timeline'
-                ? "bg-slate-900 text-white shadow-sm"
-                : "text-slate-600 hover:bg-slate-100 dark:bg-slate-800"
-            )}
-          >
-            <Clock className="w-4 h-4 text-cyan-400" />
-            Süreç Akışı
-          </button>
-
-          <button
-            onClick={() => setActiveTab('matrix')}
-            className={cn(
-              "px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2",
-              activeTab === 'matrix'
-                ? "bg-slate-900 text-white shadow-sm"
-                : "text-slate-600 hover:bg-slate-100 dark:bg-slate-800"
-            )}
-          >
-            <LayoutGrid className="w-4 h-4 text-cyan-400" />
-            Renk-Beden Matrisi
-          </button>
-
-          <button
-            onClick={() => setActiveTab('capacity')}
-            className={cn(
-              "px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2",
-              activeTab === 'capacity'
-                ? "bg-slate-900 text-white shadow-sm"
-                : "text-slate-600 hover:bg-slate-100 dark:bg-slate-800"
-            )}
-          >
-            <Gauge className="w-4 h-4 text-cyan-400" />
-            Kapasite
-          </button>
-
-          <button
-            onClick={() => setActiveTab('pipeline')}
-            className={cn(
-              "px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2",
-              activeTab === 'pipeline'
-                ? "bg-slate-900 text-white shadow-sm"
-                : "text-slate-600 hover:bg-slate-100 dark:bg-slate-800"
-            )}
-          >
-            <Layers className="w-4 h-4 text-indigo-400" />
-            1. Üretim Proses Hattı & Takip
-          </button>
-
-          <button
-            onClick={() => setActiveTab('orders_pool')}
-            className={cn(
-              "px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2",
-              activeTab === 'orders_pool'
-                ? "bg-slate-900 text-white shadow-sm"
-                : "text-slate-600 hover:bg-slate-100 dark:bg-slate-800"
-            )}
-          >
-            <ShoppingCart className="w-4 h-4 text-amber-400" />
-            2. Bekleyen Sipariş Havuzu
-            {pendingSalesOrders.filter(o => o.hasMissingWorkOrders).length > 0 && (
-              <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
-            )}
-          </button>
-
-          <button
-            onClick={() => setActiveTab('mrp')}
-            className={cn(
-              "px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2",
-              activeTab === 'mrp'
-                ? "bg-slate-900 text-white shadow-sm"
-                : "text-slate-600 hover:bg-slate-100 dark:bg-slate-800"
-            )}
-          >
-            <RefreshCw className="w-4 h-4 text-rose-400" />
-            3. Malzeme İhtiyaç Planlama (MRP)
-            {(mrpResult?.shortageItemsCount || 0) > 0 && (
-              <span className="px-1.5 py-0.2 text-[9px] font-black bg-rose-500 text-white rounded-md">
-                {mrpResult?.shortageItemsCount} Eksik
-              </span>
-            )}
-          </button>
-
-          <button
-            onClick={() => setActiveTab('barcode_terminal')}
-            className={cn(
-              "px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2",
-              activeTab === 'barcode_terminal'
-                ? "bg-slate-900 text-white shadow-sm"
-                : "text-slate-600 hover:bg-slate-100 dark:bg-slate-800"
-            )}
-          >
-            <Barcode className="w-4 h-4 text-emerald-400" />
-            4. Barkodlu İstasyon Terminali
-          </button>
-
-          <button
-            onClick={() => setActiveTab('recipes')}
-            className={cn(
-              "px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2",
-              activeTab === 'recipes'
-                ? "bg-slate-900 text-white shadow-sm"
-                : "text-slate-600 hover:bg-slate-100 dark:bg-slate-800"
-            )}
-          >
-            <Settings2 className="w-4 h-4 text-sky-400" />
-            5. Reçeteler (BoM)
-          </button>
-
-          <button
-            onClick={() => setActiveTab('reports')}
-            className={cn(
-              "px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2",
-              activeTab === 'reports'
-                ? "bg-slate-900 text-white shadow-sm"
-                : "text-slate-600 hover:bg-slate-100 dark:bg-slate-800"
-            )}
-          >
-            <BarChart3 className="w-4 h-4 text-purple-400" />
-            6. Üretim & Hat Raporları
-          </button>
-        </div>
-
-        <div className="flex items-center gap-2">
+      <div className="rounded-card border border-line bg-surface p-2 shadow-xs">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div role="group" aria-label="Üretim bölümleri" className="flex flex-wrap items-center gap-1">
+            {productionTabGroups.map((group) => (
+              <button
+                key={group.key}
+                type="button"
+                onClick={() => setActiveTab(group.items[0].key)}
+                aria-pressed={activeNavGroup.key === group.key}
+                className={cn(
+                  'rounded-control px-3 py-1.5 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                  activeNavGroup.key === group.key
+                    ? 'bg-brand-soft text-brand-fg'
+                    : 'text-fg-muted hover:bg-surface-hover hover:text-fg-strong',
+                )}
+              >
+                {group.label}
+              </button>
+            ))}
+          </div>
           <Link
             to="/reports?tab=production"
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-brand-fg bg-brand-soft hover:bg-brand-soft rounded-lg transition-colors"
+            className="inline-flex items-center gap-1.5 rounded-control px-3 py-1.5 text-xs font-bold text-brand-fg hover:bg-brand-soft"
           >
-            <span>Raporlar Merkezi</span>
-            <ExternalLink className="w-3.5 h-3.5" />
+            Raporlar Merkezi <ExternalLink className="h-3.5 w-3.5" />
           </Link>
         </div>
-
+        <Tabs
+          items={activeNavGroup.items}
+          value={activeTab}
+          onChange={(key) => setActiveTab(key as ProductionTab)}
+          size="sm"
+          ariaLabel={`${activeNavGroup.label} sekmeleri`}
+          className="mt-1"
+        />
         {activeTab === 'pipeline' && (
-          <div className="flex items-center gap-2 w-full sm:w-auto mt-2 sm:mt-0">
+          <div className="mt-2 flex w-full flex-wrap items-center gap-2">
             <div className="relative flex-1 sm:w-64">
               <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
@@ -953,7 +869,7 @@ export default function Production() {
                     <StageIcon className={cn("w-4 h-4", isActive ? "text-indigo-300" : "text-slate-400")} />
                     <span className={cn(
                       "text-xs font-black px-1.5 py-0.5 rounded-md",
-                      isActive ? "bg-white dark:bg-slate-900/20 text-white" : "bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200"
+                      isActive ? "bg-white/20 text-white" : "bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200"
                     )}>
                       {count}
                     </span>
@@ -1308,7 +1224,7 @@ export default function Production() {
                     {allProdRecipes.length > 0 && (
                       <div className="space-y-2 max-h-52 overflow-y-auto pr-1">
                         {allProdRecipes.map((rc, rcIdx) => (
-                          <div key={`prod-${prod.id}-rc-${rc.id || rcIdx}-${rc.targetColor || 'genel'}`} className="bg-slate-50 dark:bg-slate-800/50/80 p-3 rounded-2xl border border-slate-200 dark:border-slate-700/80 dark:border-slate-800/80 space-y-2">
+                          <div key={`prod-${prod.id}-rc-${rc.id || rcIdx}-${rc.targetColor || 'genel'}`} className="bg-slate-50 dark:bg-slate-800/80 p-3 rounded-2xl border border-slate-200 dark:border-slate-700/80 dark:border-slate-800/80 space-y-2">
                             <div className="flex items-center justify-between">
                               <span className="text-[10px] font-black px-2 py-0.5 rounded-md uppercase bg-brand-soft text-brand-fg border border-brand/30">
                                 {rc.targetColor ? `🎨 ${rc.targetColor} Reçetesi` : '🌐 Genel (Tüm Renkler)'}

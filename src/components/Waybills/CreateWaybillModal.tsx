@@ -114,43 +114,48 @@ export default function CreateWaybillModal({
   }, [contactId, type, initialOrderId]);
 
   // Helper to import items from an order
-  const importOrderItems = (order: any) => {
-    setSelectedOrderId(order.id);
-    setSelectedOrderNumber(order.orderNumber);
+  const importOrderItems = async (order: any) => {
+    try {
+      // Sipariş satırlarında birim tutulmuyor; ürün kartları henüz yüklenmediyse bekle.
+      const availableProducts = products ?? await api.products.list();
+      const mappedItems: Omit<WaybillItem, 'id' | 'waybillId'>[] = order.items.map((oi: any) => {
+        const product = availableProducts.find(p => p.id === oi.productId);
+        const remaining = oi.remainingQuantity ?? oi.quantity;
+        const unitPrice = oi.unitPrice ?? 0;
+        const discountRate = oi.discountRate ?? 0;
+        const taxRate = oi.taxRate ?? product?.vatRate ?? 20;
 
-    const mappedItems: Omit<WaybillItem, 'id' | 'waybillId'>[] = order.items.map((oi: any) => {
-      const product = products?.find(p => p.id === oi.productId);
-      const remaining = oi.remainingQuantity || oi.quantity;
-      const unitPrice = oi.unitPrice || 0;
-      const discountRate = oi.discountRate || 0;
-      const taxRate = oi.taxRate || 20;
+        const sub = remaining * unitPrice;
+        const discAmt = (sub * discountRate) / 100;
+        const taxable = sub - discAmt;
+        const taxAmt = (taxable * taxRate) / 100;
+        const tot = taxable + taxAmt;
 
-      const sub = remaining * unitPrice;
-      const discAmt = (sub * discountRate) / 100;
-      const taxable = sub - discAmt;
-      const taxAmt = (taxable * taxRate) / 100;
-      const tot = taxable + taxAmt;
+        return {
+          productId: oi.productId,
+          orderItemId: oi.id,
+          productCode: oi.productCode || product?.code || 'STK',
+          productName: oi.productName || product?.name || 'Ürün',
+          color: oi.color,
+          size: oi.size,
+          quantity: remaining,
+          unit: oi.unit || product?.unit || 'Çift',
+          unitPrice,
+          discountRate,
+          discountAmount: discAmt,
+          taxRate,
+          taxAmount: taxAmt,
+          total: tot
+        };
+      });
 
-      return {
-        productId: oi.productId,
-        orderItemId: oi.id,
-        productCode: oi.productCode || product?.code || 'STK',
-        productName: oi.productName || product?.name || 'Ürün',
-        color: oi.color,
-        size: oi.size,
-        quantity: remaining,
-        unit: 'Çift',
-        unitPrice,
-        discountRate,
-        discountAmount: discAmt,
-        taxRate,
-        taxAmount: taxAmt,
-        total: tot
-      };
-    });
-
-    setItems(mappedItems);
-    setIsOrderSelectorOpen(false);
+      setSelectedOrderId(order.id);
+      setSelectedOrderNumber(order.orderNumber);
+      setItems(mappedItems);
+      setIsOrderSelectorOpen(false);
+    } catch (error) {
+      showToast('Sipariş ürünleri yüklenemedi: ' + (error instanceof Error ? error.message : String(error)), 'error');
+    }
   };
 
   // Add blank manual item row
@@ -192,6 +197,7 @@ export default function CreateWaybillModal({
           current.productId = prod.id;
           current.productCode = prod.code;
           current.productName = prod.name;
+          current.unit = prod.unit;
           current.unitPrice = type === 'sales' ? (prod.sellingPrice || 0) : (prod.buyingPrice || 0);
         }
       }
@@ -620,6 +626,9 @@ export default function CreateWaybillModal({
                             onChange={(e) => updateItem(idx, 'unit', e.target.value)}
                             className="w-full p-1.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded text-center"
                           >
+                            {!['Çift', 'Adet', 'Metre', 'Kg', 'Paket'].includes(item.unit) && (
+                              <option value={item.unit}>{item.unit}</option>
+                            )}
                             <option value="Çift">Çift</option>
                             <option value="Adet">Adet</option>
                             <option value="Metre">Metre</option>
@@ -803,7 +812,7 @@ export default function CreateWaybillModal({
                         {ord.items?.length || 0} kalem ürün sevk edilmeyi bekliyor
                       </div>
                       <div className="flex justify-between items-center text-[11px] text-slate-500 dark:text-slate-400 pt-1 border-t border-slate-100 dark:border-slate-800">
-                        <span>Kalan Miktar: {ord.items?.reduce((s: number, i: any) => s + (i.remainingQuantity || i.quantity), 0)} Çift</span>
+                        <span>Kalan Miktar: {ord.items?.reduce((s: number, i: any) => s + (i.remainingQuantity ?? i.quantity), 0)}</span>
                         <span className="text-indigo-600 font-bold">Bu Siparişi Aktar →</span>
                       </div>
                     </div>

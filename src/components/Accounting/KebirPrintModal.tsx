@@ -108,7 +108,7 @@ export default function KebirPrintModal({
     try {
       const html = printContentRef.current.innerHTML;
       await printHtml(html, {
-        title: `ProERP_Defteri_Kebir_${accountCode}_${new Date().toISOString().slice(0, 10)}`,
+        title: `DMR Nexus_Defteri_Kebir_${accountCode}_${new Date().toISOString().slice(0, 10)}`,
         css: getPrintCss(),
         landscape: orientation === 'landscape'
       });
@@ -120,7 +120,7 @@ export default function KebirPrintModal({
   const handleOpenNewTab = () => {
     if (!printContentRef.current) return;
     const html = printContentRef.current.innerHTML;
-    openPrintWindow(html, `ProERP Defter-i Kebir (${accountCode})`, {
+    openPrintWindow(html, `DMR Nexus Defter-i Kebir (${accountCode})`, {
       css: getPrintCss(),
       landscape: orientation === 'landscape'
     });
@@ -233,7 +233,7 @@ export default function KebirPrintModal({
                       T.C. MALİYE MEVZUATINA UYGUN DEFTER-İ KEBİR / MUAVİN DEFTER
                     </div>
                     <h1 className="text-base sm:text-lg font-black text-slate-950 uppercase tracking-tight mt-0.5">
-                      {companySettings?.companyTitle || companySettings?.companyName || 'PRO ERP AYAKKABI VE DERİ MAMULLERİ SAN. TİC. LTD. ŞTİ.'}
+                      {companySettings?.companyTitle || companySettings?.companyName || 'DMR Nexus'}
                     </h1>
                     <p className="text-[11px] text-slate-600 font-medium">
                       {companySettings?.address || 'İkitelli OSB Mah. Aykosan Sanayi Sitesi 4. Ada A Blok No: 12-14 Başakşehir / İSTANBUL'}
@@ -376,14 +376,14 @@ export default function KebirPrintModal({
 
             {/* 5. İMZA VE ONAY ALANLARI */}
             <div className="mt-8 pt-4 border-t-2 border-slate-300 grid grid-cols-2 gap-8 text-center text-xs">
-              <div className="p-3 border border-slate-300 rounded bg-slate-50 dark:bg-slate-800/50/50">
+              <div className="p-3 border border-slate-300 rounded bg-slate-50 dark:bg-slate-800/50">
                 <div className="font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wide">DÜZENLEYEN</div>
                 <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Muhasebe ve Finans Sorumlusu</div>
                 <div className="h-14 mt-2 border-b border-dashed border-slate-400"></div>
                 <div className="text-[10px] text-slate-400 mt-1">İmza / Kaşe</div>
               </div>
 
-              <div className="p-3 border border-slate-300 rounded bg-slate-50 dark:bg-slate-800/50/50">
+              <div className="p-3 border border-slate-300 rounded bg-slate-50 dark:bg-slate-800/50">
                 <div className="font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wide">İNCELEYEN VE ONAYLAYAN</div>
                 <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Mali Müşavir / Şirket Müdürü</div>
                 <div className="h-14 mt-2 border-b border-dashed border-slate-400"></div>
@@ -393,7 +393,7 @@ export default function KebirPrintModal({
 
             {/* 6. DİPNOT */}
             <div className="mt-4 text-[9px] text-slate-500 dark:text-slate-400 flex justify-between items-center border-t border-slate-200 dark:border-slate-700 pt-2">
-              <span>ProERP Büyük Defter (Defter-i Kebir) Sistemi &bull; Belge No: DK-{accountCode}</span>
+              <span>DMR Nexus Büyük Defter (Defter-i Kebir) Sistemi &bull; Belge No: DK-{accountCode}</span>
               <span>213 Sayılı V.U.K. ve TTK Hükümlerine Uygundur</span>
             </div>
           </div>

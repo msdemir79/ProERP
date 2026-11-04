@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Search, ChevronRight } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
 import { api } from '../api/client';
 import { useApiQueryFull } from '../hooks/useApiQuery';
 import type { Contact } from '../types';
@@ -15,9 +16,46 @@ const TYPE_LABEL: Record<string, string> = {
 
 /** Mobil cari listesi: arama + bakiye; satıra dokununca detay sayfası açılır. */
 export default function MobileContacts() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const requestedContactId = searchParams.get('contactId');
   const [q, setQ] = useState('');
   const [sel, setSel] = useState<Contact | null>(null);
   const { data, loading } = useApiQueryFull<Contact[]>(() => api.contacts.list(), [], ['contacts']);
+
+  useEffect(() => {
+    if (!requestedContactId) { setSel(null); return; }
+    const id = Number(requestedContactId);
+    if (!Number.isSafeInteger(id) || id <= 0) { setSel(null); return; }
+    const listedContact = data?.find((contact) => contact.id === id);
+    if (listedContact) { setSel(listedContact); return; }
+    let active = true;
+    api.contacts.get(id)
+      .then((contact) => { if (active) setSel(contact ?? null); })
+      .catch(() => { if (active) setSel(null); });
+    return () => { active = false; };
+  }, [requestedContactId, data]);
+
+  const openContact = (contact: Contact) => {
+    setSel(contact);
+    if (contact.id != null) {
+      setSearchParams((current) => {
+        const next = new URLSearchParams(current);
+        next.set('contactId', String(contact.id));
+        return next;
+      });
+    }
+  };
+
+  const closeContact = () => {
+    setSel(null);
+    if (requestedContactId) {
+      setSearchParams((current) => {
+        const next = new URLSearchParams(current);
+        next.delete('contactId');
+        return next;
+      }, { replace: true });
+    }
+  };
 
   const rows = useMemo(() => {
     const all = data ?? [];
@@ -55,7 +93,7 @@ export default function MobileContacts() {
             <button
               type="button"
               key={c.id ?? c.code ?? c.name}
-              onClick={() => setSel(c)}
+              onClick={() => openContact(c)}
               className="w-full flex items-center gap-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3 py-3 text-left"
             >
               <div className="min-w-0 flex-1">
@@ -81,7 +119,7 @@ export default function MobileContacts() {
         })}
       </div>
 
-      {sel && <MobileContactDetail contact={sel} onClose={() => setSel(null)} />}
+      {sel && <MobileContactDetail contact={sel} onClose={closeContact} />}
     </>
   );
 }

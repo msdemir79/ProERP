@@ -6,6 +6,8 @@ import { cn } from '../lib/utils';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { registerBackButtonHandler } from '../mobile/nativeBridge';
 
+const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -17,6 +19,8 @@ interface ModalProps {
   footer?: React.ReactNode;
   allowFullscreen?: boolean;
   defaultFullscreen?: boolean;
+  /** Açıldığında pencereyi kenar boşluğu olmadan ekranın tamamına yayar. */
+  edgeToEdge?: boolean;
   /** Başka bir modalın içinden açılıyorsa ESC yalnızca bu modalı kapatır. */
   nested?: boolean;
 }
@@ -32,19 +36,55 @@ export default function Modal({
   footer,
   allowFullscreen = true,
   defaultFullscreen = false,
+  edgeToEdge = false,
   nested = false
 }: ModalProps) {
   const [isFullscreen, setIsFullscreen] = React.useState(defaultFullscreen);
+  const dialogRef = React.useRef<HTMLDivElement>(null);
+  const titleId = React.useId();
   const isMobile = useIsMobile();
   // Telefonda modal her zaman tam ekran: küçük ekranda kenar boşluğu/yuvarlatma
   // alanı çalıyor ve içerik kırpılıyordu.
-  const fullscreen = isFullscreen || isMobile;
+  const fullscreen = edgeToEdge || isFullscreen || isMobile;
 
   React.useEffect(() => {
     if (isOpen) {
       setIsFullscreen(defaultFullscreen);
     }
   }, [isOpen, defaultFullscreen]);
+
+  React.useEffect(() => {
+    if (!isOpen) return;
+    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const dialog = dialogRef.current;
+    const preferred = dialog?.querySelector<HTMLElement>('[autofocus]');
+    (preferred ?? dialog)?.focus();
+    return () => {
+      if (opener?.isConnected) opener.focus();
+    };
+  }, [isOpen]);
+
+  const keepFocusInside = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key !== 'Tab') return;
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    const items = (Array.from(dialog.querySelectorAll(FOCUSABLE)) as HTMLElement[])
+      .filter(item => item.getClientRects().length > 0 && getComputedStyle(item).visibility !== 'hidden');
+    if (!items.length) {
+      event.preventDefault();
+      dialog.focus();
+      return;
+    }
+    const first = items[0];
+    const last = items[items.length - 1];
+    if (event.shiftKey && (document.activeElement === first || document.activeElement === dialog)) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  };
 
   React.useEffect(() => {
     if (!isOpen) return;
@@ -94,7 +134,7 @@ export default function Modal({
           className={cn(
             "fixed inset-0 flex items-center justify-center overflow-hidden transition-all",
             nested ? "z-[80]" : "z-[60]",
-            isMobile ? "p-0" : fullscreen ? "p-0 sm:p-1 md:p-2" : "p-2 sm:p-4 md:p-6"
+            edgeToEdge || isMobile ? "p-0" : fullscreen ? "p-0 sm:p-1 md:p-2" : "p-2 sm:p-4 md:p-6"
           )}
         >
           <div
@@ -102,15 +142,21 @@ export default function Modal({
             className="fixed inset-0 bg-slate-950/70 backdrop-blur-md"
           />
           <motion.div
+            ref={dialogRef}
             key="modal-panel"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={titleId}
+            tabIndex={-1}
+            onKeyDown={keepFocusInside}
             initial={isMobile ? { opacity: 0, y: "100%" } : { opacity: 0, scale: 0.96, y: 15 }}
             animate={isMobile ? { opacity: 1, y: 0 } : { opacity: 1, scale: 1, y: 0 }}
             exit={isMobile ? { opacity: 0, y: "100%" } : { opacity: 0, scale: 0.96, y: 15 }}
             transition={{ type: "spring", duration: 0.35, bounce: 0.1 }}
             className={cn(
               "relative z-10 bg-white dark:bg-slate-900 w-full shadow-2xl flex flex-col overflow-hidden border border-slate-200 dark:border-slate-700/80 transition-all duration-200",
-              isMobile
-                ? "h-full max-h-full w-full max-w-full rounded-none border-0"
+              edgeToEdge || isMobile
+                ? "h-[100dvh] max-h-[100dvh] w-full max-w-none rounded-none border-0"
                 : fullscreen
                 ? "h-[98vh] max-h-[99vh] max-w-[99vw] rounded-xl sm:rounded-2xl"
                 : cn("max-h-[94vh] rounded-2xl md:rounded-3xl", sizeClasses[size] || sizeClasses.xl),
@@ -119,11 +165,11 @@ export default function Modal({
           >
             {/* Modal Header */}
             <div className="px-4 py-3.5 sm:px-6 sm:py-4.5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-white dark:bg-slate-900 shrink-0 sticky top-0 z-20">
-              <h3 className="text-sm sm:text-base font-black text-slate-800 dark:text-slate-200 uppercase tracking-wider flex items-center gap-2.5">
+              <h3 id={titleId} className="min-w-0 flex-1 break-words text-sm sm:text-base font-black text-slate-800 dark:text-slate-200 uppercase tracking-wider flex items-center gap-2.5">
                 <span className="w-2.5 h-2.5 rounded-full bg-indigo-600 shadow-sm shadow-indigo-600/30"></span>
                 {title}
               </h3>
-              <div className="flex items-center gap-2">
+              <div className="flex shrink-0 items-center gap-2">
                 {headerActions}
                 {allowFullscreen && !isMobile && (
                   <button

@@ -71,7 +71,7 @@ Ekranlarda yetkiye göre sekmeler gösterilir; listelerde son 200 kayıt bulunur
 
 ## Kalan işler — önerilen uygulama sırası
 
-1. **Mevcut kapsamı tamamlama:** Eski regresyon testlerini yeni işlem sözleşmelerine uyarlama; stok sayımı/fark ve rezervasyon uzlaştırma; tüm düzenlemelerde sürüm kontrolü; tam dönem sonu mutabakatları.
+1. **Mevcut kapsamı tamamlama:** Eski regresyon testlerini yeni işlem sözleşmelerine uyarlama; tüm düzenlemelerde sürüm kontrolü; tam dönem sonu mutabakatları. Ürün/varyant stok sayımı, fark onayı ve rezervasyon uzlaştırma 16 Ekim adımında eklendi; ayrıntılar `ERP_STOK_KONTROL_2026-10-16.md` dosyasında.
 2. **Depo ve izlenebilirlik:** Depo/raf bazlı stok defteri, transfer ve transit durum, lot/seri, giriş kalite karantinası, sayım/fark onayı. Mevcut toplam stoğun depo açılış dağıtımı ayrıca planlanmalı.
 3. **Satın alma bütünlüğü:** İhtiyaç → teklif karşılaştırma → talep → sipariş → mal kabul → kalite → alış faturası; miktar/fiyat toleranslı üçlü eşleştirme; tedarikçi iadesi.
 4. **Üretim maliyeti ve planlama:** Fiilî sarf/işçilik/fason/genel gider, yarı mamul ve maliyet kapanışı; iş merkezi takvimi, kapasite, operasyon süreleri ve termin tahmini.

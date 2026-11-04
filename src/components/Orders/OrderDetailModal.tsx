@@ -164,7 +164,7 @@ export default function OrderDetailModal({
 
                     <div className="overflow-x-auto">
                       <table className="w-full text-left">
-                        <thead className="bg-slate-50 dark:bg-slate-800/50/50 border-b border-slate-100 dark:border-slate-800 text-[10px] font-black text-slate-400 uppercase tracking-wider">
+                        <thead className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800 text-[10px] font-black text-slate-400 uppercase tracking-wider">
                           <tr>
                             <th className="p-3">Ürün & Renk</th>
                             <th className="p-3 text-center">Sipariş</th>

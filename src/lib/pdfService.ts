@@ -1,5 +1,5 @@
 /**
- * Universal PDF Generation Service for ProERP
+ * Universal PDF Generation Service for DMR Nexus
  * Uses html2canvas-pro and jsPDF to produce crisp, vectorized/high-DPI PDF documents
  * Supports A4 portrait/landscape and 100x150 mm thermal shipping labels.
  */

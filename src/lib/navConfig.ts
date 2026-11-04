@@ -126,10 +126,25 @@ export function labelForPath(pathname: string): string | undefined {
     const dashboard = NAV.find((e) => e.href === '/');
     return dashboard?.label;
   }
+  const pageLabels: Record<string, string> = {
+    '/inventory/templates': 'Şablon Yönetimi',
+    '/reports/summary': 'Stok Özeti',
+    '/reports/detail': 'Stok Detay ve Asorti Raporu',
+    '/reports/movements': 'Stok Hareketleri',
+    '/reports/broken': 'Kırık Beden Raporu',
+  };
+  if (pageLabels[pathname]) return pageLabels[pathname];
+  // Önce tam yaprağı ara; aksi halde /production/workflows için ilk
+  // /production eşleşir ve tarayıcı başlığı yanlış görünür.
+  for (const entry of NAV) {
+    for (const leaf of leavesOf(entry)) {
+      if (leaf.href === pathname) return leaf.name;
+    }
+  }
   const segment = pathname.split('/')[1];
   for (const entry of NAV) {
     for (const leaf of leavesOf(entry)) {
-      if (leaf.href.replace('/', '') === segment) return leaf.name;
+      if (leaf.href === `/${segment}`) return leaf.name;
     }
   }
   return undefined;

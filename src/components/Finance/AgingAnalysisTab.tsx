@@ -134,7 +134,7 @@ export const AgingAnalysisTab: React.FC<AgingAnalysisTabProps> = ({
 
     const htmlContent = `
       <div style="font-family: Arial, sans-serif; padding: 20px;">
-        <h2 style="margin-bottom: 4px;">PROERP - ${title}</h2>
+        <h2 style="margin-bottom: 4px;">DMR NEXUS - ${title}</h2>
         <p style="color: #666; font-size: 12px; margin-bottom: 16px;">Tarih: ${new Date().toLocaleDateString('tr-TR')}</p>
         <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
           <thead>

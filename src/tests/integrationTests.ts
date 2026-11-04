@@ -1,5 +1,5 @@
 /**
- * ProERP Faz 3 — Integration + Concurrency Testleri (item 5, 6).
+ * DMR Nexus Faz 3 — Integration + Concurrency Testleri (item 5, 6).
  *
  * Gerçek HTTP + gerçek MySQL + gerçek RBAC/op yolu üzerinde, harness'ın mint
  * ettiği super_admin oturumuyla koşar. Sertleştirme garantilerini uçtan uca
@@ -92,7 +92,7 @@ function balancedLines(amount = 100) {
 async function main(): Promise<void> {
   srv = await startTestServer(1);
   console.log('\n======================================================');
-  console.log(' PROERP FAZ 3 — INTEGRATION + CONCURRENCY TESTLERİ');
+  console.log(' DMR NEXUS FAZ 3 — INTEGRATION + CONCURRENCY TESTLERİ');
   console.log(` Hedef: ${srv.baseUrl} (canlı DB, in-process oturum)`);
   console.log('======================================================\n');
 

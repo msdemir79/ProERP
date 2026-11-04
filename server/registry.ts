@@ -44,6 +44,7 @@ export interface ResourceMeta {
 export const META: Record<string, ResourceMeta> = {
   operationRequests: { module: 'users', searchable: [], defaultOrder: 'id DESC', readOnly: true, hidden: ['requestKey', 'payloadHash', 'result'] },
   stockReservations: { module: 'inventory', searchable: [], defaultOrder: 'id DESC', readOnly: true },
+  stockCounts: { module: 'inventory', searchable: ['countNumber', 'notes'], defaultOrder: 'id DESC', readOnly: true },
   qualityChecks: { module: 'production', searchable: ['notes'], defaultOrder: 'id DESC', readOnly: true },
   purchaseRequests: { module: 'orders', searchable: ['requestNumber', 'notes'], defaultOrder: 'id DESC', readOnly: true },
   contacts: {

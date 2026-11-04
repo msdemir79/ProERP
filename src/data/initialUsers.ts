@@ -19,7 +19,7 @@ export const INITIAL_USERS: AppUser[] = [
   {
     username: 'ayildiz',
     fullName: 'Ayşe Yıldız',
-    email: 'ayse.yildiz@proerp.com',
+    email: 'ayse.yildiz@dmr-nexus.example',
     phone: '0 (533) 444 20 02',
     title: 'Satış & Pazarlama Müdürü',
     department: 'SATIŞ & PAZARLAMA',
@@ -34,7 +34,7 @@ export const INITIAL_USERS: AppUser[] = [
   {
     username: 'kcelik',
     fullName: 'Kemal Çelik',
-    email: 'kemal.celik@proerp.com',
+    email: 'kemal.celik@dmr-nexus.example',
     phone: '0 (535) 333 30 03',
     title: 'Üretim & İmalat Şefi',
     department: 'ÜRETİM & FABRİKA',
@@ -49,7 +49,7 @@ export const INITIAL_USERS: AppUser[] = [
   {
     username: 'hkaya',
     fullName: 'Hasan Kaya',
-    email: 'hasan.kaya@proerp.com',
+    email: 'hasan.kaya@dmr-nexus.example',
     phone: '0 (542) 222 40 04',
     title: 'Depo & Sevkiyat Sorumlusu',
     department: 'DEPO & LOJİSTİK',
@@ -64,7 +64,7 @@ export const INITIAL_USERS: AppUser[] = [
   {
     username: 'fyilmaz',
     fullName: 'Fatma Yılmaz',
-    email: 'fatma.yilmaz@proerp.com',
+    email: 'fatma.yilmaz@dmr-nexus.example',
     phone: '0 (544) 111 50 05',
     title: 'İnsan Kaynakları Uzmanı',
     department: 'İNSAN KAYNAKLARI',
@@ -79,7 +79,7 @@ export const INITIAL_USERS: AppUser[] = [
   {
     username: 'saksoy',
     fullName: 'Selin Aksoy',
-    email: 'selin.aksoy@proerp.com',
+    email: 'selin.aksoy@dmr-nexus.example',
     phone: '0 (530) 999 60 06',
     title: 'Mali İşler & Muhasebe Müdürü',
     department: 'FİNANS & MUHASEBE',
@@ -94,7 +94,7 @@ export const INITIAL_USERS: AppUser[] = [
   {
     username: 'bsahin',
     fullName: 'Bülent Şahin',
-    email: 'bulent.sahin@proerp.com',
+    email: 'bulent.sahin@dmr-nexus.example',
     phone: '0 (555) 888 70 07',
     title: 'Bağımsız Denetçi / Kalite Kontrolör',
     department: 'DENETİM & KALİTE',

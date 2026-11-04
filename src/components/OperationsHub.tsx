@@ -12,6 +12,7 @@ import DataGrid, { StatusPill } from './Common/DataGrid';
 import Modal from './Modal';
 import { quantityDecimals } from '../lib/inventoryCalculator';
 import type { PurchaseRequestRow } from '../lib/workflowTypes';
+import StockControl from './Inventory/StockControl';
 
 let purchaseLineSequence = 0;
 const newPurchaseLine = () => ({ key: String(++purchaseLineSequence), productId: '', quantity: '', unitPrice: '', taxRate: '20' });
@@ -22,6 +23,8 @@ export default function OperationsHub({ initialTab }: { initialTab?: 'reservatio
   const { pathname } = useLocation();
   const tabs = [
     { key: 'reservations', label: 'Stok Rezervasyonları', module: 'inventory' as const, icon: <PackageCheck className="w-4 h-4" /> },
+    { key: 'counts', label: 'Stok Sayımı', module: 'inventory' as const, icon: <ClipboardCheck className="w-4 h-4" /> },
+    { key: 'reconciliation', label: 'Rezervasyon Uzlaştırma', module: 'inventory' as const, icon: <PackageCheck className="w-4 h-4" /> },
     { key: 'quality', label: 'Kalite Kontrolleri', module: 'production' as const, icon: <ClipboardCheck className="w-4 h-4" /> },
     { key: 'purchasing', label: 'Satın Alma Talepleri', module: 'orders' as const, icon: <ShoppingCart className="w-4 h-4" /> },
   ].filter(tab => hasPermission(tab.module, 'view'));
@@ -57,6 +60,7 @@ export default function OperationsHub({ initialTab }: { initialTab?: 'reservatio
   return <div className="max-w-[1500px] mx-auto space-y-5">
     <div><h1 className="text-xl font-bold text-fg-strong">Operasyon ve onay merkezi</h1><p className="mt-1 text-sm text-fg-muted">Stok ayırın, kalite sonuçlarını onaylayın ve satın alma taleplerini siparişe dönüştürün.</p></div>
     <Tabs items={tabs} value={active} onChange={setSelected} ariaLabel="Operasyon süreçleri" />
+    {(active === 'counts' || active === 'reconciliation') && <div role="tabpanel" id={`tabpanel-${active}`} aria-labelledby={`tab-${active}`}><StockControl mode={active} /></div>}
     {summary.error && <div role="alert" className="rounded-xl bg-danger-soft text-danger p-4">{summary.error.message} <Button onClick={summary.refetch}>Tekrar dene</Button></div>}
     {summary.loading && !summary.data && <p role="status" className="p-4 text-fg-muted">Süreçler yükleniyor…</p>}
     {active === 'reservations' && <div role="tabpanel" id="tabpanel-reservations" aria-labelledby="tab-reservations" className="space-y-4">
@@ -121,7 +125,7 @@ export default function OperationsHub({ initialTab }: { initialTab?: 'reservatio
         { key: 'actions', title: 'Karar', sortable: false, render: row => row.status === 'pending' && hasPermission('orders', 'approve') ? <div className="flex gap-2"><Button size="sm" disabled={busy} onClick={() => { setReason(''); setDecision({ id: row.id, verdict: 'approved' }); }}>Onayla</Button><Button size="sm" disabled={busy} variant="danger" onClick={() => { setReason(''); setDecision({ id: row.id, verdict: 'rejected' }); }}>Reddet</Button></div> : null },
       ]} />
     </div>}
-    <p className="text-xs text-fg-muted">Listelerde son 200 kayıt gösterilir.</p>
+    <p className="text-xs text-fg-muted">{active === 'counts' ? 'Sayımlar 100 kayıtlık sayfalar halinde gösterilir.' : active === 'reconciliation' ? 'Aktif rezervasyonlar 200 kayıtlık gruplar halinde taranır.' : 'Listelerde son 200 kayıt gösterilir.'}</p>
     <Modal isOpen={!!detailRequest} onClose={() => setDetailRequest(null)} title={detailRequest?.requestNumber || 'Satın alma kalemleri'} size="3xl"><div className="space-y-4"><p>{detailRequest?.supplierName} · {detailRequest?.notes}</p><DataGrid<PurchaseRequestRow['items'][number] & { rowId: number }> data={(detailRequest?.items || []).map((item, index) => ({ ...item, rowId: index }))} rowKey="rowId" columns={[
       { key: 'productName', title: 'Ürün' }, { key: 'quantity', title: 'Miktar' }, { key: 'unit', title: 'Birim' }, { key: 'unitPrice', title: 'Birim fiyat', render: row => formatMoney(Number(row.unitPrice)) }, { key: 'taxRate', title: 'KDV (%)' }, { key: 'total', title: 'Toplam (TRY)', render: row => formatMoney(Number(row.total)) },
     ]} /><p className="font-bold text-right">Toplam: {formatMoney(Number(detailRequest?.totalAmount || 0))} TRY</p></div></Modal>

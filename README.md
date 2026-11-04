@@ -1,6 +1,10 @@
-# ProERP — Muhasebe ve Üretim
+# DMR Nexus — Muhasebe ve Üretim
 
 Ayakkabı ve imalat fabrikalarına özel; canlı kamera barkod/karekod okuyucu, üretim refakat kartı (rota fişi), reçeteli BOM hammadde sarfiyat düşümü, muhasebe, stok ve iş emri ERP yönetim sistemi.
+
+## Marka
+
+Uygulamanın adı **DMR Nexus**. Giriş ekranındaki logo ve uygulama simgesi `public/brand/` altında; yeni logo tasarım seçenekleri `branding/concepts/` altında bulunur. Resmi belgelerde kullanılan şirket unvanı ve şirket logosu firma ayarlarında ayrı tutulur.
 
 ## Modüller
 
@@ -159,7 +163,7 @@ Geri yükleme için yukarıdaki [Geri dönüş (restore)](#üretim-dağıtım-de
 | `npm test` | Birim testleri (bordro, maliyet, muhasebe doğrulayıcı) |
 | `npm run test:integration` | API + eşzamanlılık + silme kapısı entegrasyon testleri (canlı DB) |
 | `npm run test:delete` | Silme politikası motorunun uçtan uca testleri (kademe 0–3, fatura↔fiş, guard'lar) |
-| `npm run test:rbac` | Rol bazlı yetki matrisi testleri (`seed:users` ile açılmış rol kullanıcılarını ister) |
+| `npm run test:rbac` | Rol bazlı yetki matrisi testleri (ayrı geçici MySQL üzerinde çalışır; mevcut şirket verisini kullanmaz) |
 | `npm run test:colors` | Merkezi renk modülü testleri (birim + entegrasyon) |
 | `npm run test:load` | Yazma uçlarına eşzamanlı yük testi (p50/p95/p99 gecikme raporu) |
 

@@ -1,5 +1,5 @@
 {
-  "name": "proerp",
+  "name": "dmr-nexus",
   "private": true,
   "version": "1.2.0",
   "type": "module",
@@ -25,7 +25,7 @@
     "test:local-db": "node scripts/test-local-db.mjs",
     "test:integration": "tsx src/tests/integrationTests.ts",
     "test:delete": "tsx src/tests/deletePolicyTests.ts",
-    "test:rbac": "tsx src/tests/rbacTests.ts",
+    "test:rbac": "node scripts/test-local-db.mjs src/tests/rbacTests.ts",
     "test:colors": "tsx src/tests/colorTests.ts",
     "test:mold": "tsx src/tests/moldTests.ts",
     "test:load": "tsx src/tests/loadTest.ts"

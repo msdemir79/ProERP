@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import DetailPanel from '../Common/DetailPanel';
+import Tabs from '../Common/Tabs';
 import { getWorkflowSummary } from '../../api/client';
 import { useApiQuery } from '../../hooks/useApiQuery';
 import { formatPairs } from '../Molds/moldConstants';
@@ -31,45 +32,16 @@ import {
   type StageSummary,
 } from '../../services/productionLine';
 import { PRODUCTION_STAGES_CONFIG } from '../../services/productionService';
-import { STAGE_ACCENT, stageStatus } from './productionLineStages';
+import { STAGE_ACCENT } from './productionLineStages';
 import { Ring, SectionBand, DurationPill, PairsFooter, StageStatusLine } from './ProductionLineShared';
 
 const REFRESH_MS = 30000;
 
-/** Koyu temalı mini sekme şeridi (mockup #5 "İş Emirleri | Makine Planı | ..."). */
-function DarkTabs({
-  items,
-  value,
-  onChange,
-}: {
-  items: { key: string; label: string }[];
-  value: string;
-  onChange: (k: string) => void;
-}) {
-  return (
-    <div className="flex items-center gap-1 overflow-x-auto border-b border-slate-800">
-      {items.map((t) => (
-        <button
-          key={t.key}
-          type="button"
-          onClick={() => onChange(t.key)}
-          className={cn(
-            'shrink-0 border-b-2 px-3 py-2 text-xs font-black whitespace-nowrap transition-colors cursor-pointer',
-            value === t.key ? 'border-cyan-400 text-cyan-300' : 'border-transparent text-slate-500 hover:text-slate-300',
-          )}
-        >
-          {t.label}
-        </button>
-      ))}
-    </div>
-  );
-}
-
 function NoData({ icon: Icon, text }: { icon: typeof Camera; text: string }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-2 rounded-card border border-dashed border-slate-700 bg-slate-900/40 py-10 text-center">
-      <Icon className="h-7 w-7 text-slate-600" />
-      <p className="max-w-xs text-xs font-semibold text-slate-400">{text}</p>
+    <div className="flex flex-col items-center justify-center gap-2 rounded-card border border-dashed border-line bg-surface-raised py-10 text-center">
+      <Icon className="h-7 w-7 text-fg-muted" />
+      <p className="max-w-xs text-xs font-semibold text-fg-muted">{text}</p>
     </div>
   );
 }
@@ -171,17 +143,17 @@ export default function ProductionLineView({
   }, [selectedStage, qualityChecks, selectedWos]);
 
   return (
-    <div className="-m-4 min-h-full bg-slate-950 p-4 text-slate-100 sm:-m-6 sm:p-6">
+    <div className="rounded-card border border-line bg-surface p-4 text-fg sm:p-6">
       <SectionBand index={1} title="3D Hat Görünümü" desc="Gerçek fabrikayı andıran 3D görsel akış — veriler ERP iş emirlerinden türetilir" />
 
       {/* Başlık şeridi (mockup üst bar) */}
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <div>
-            <p className="text-2xs font-bold text-slate-500">Üretim / Hat İzleme</p>
+            <p className="text-2xs font-bold text-fg-muted">Üretim / Hat İzleme</p>
             <div className="flex items-center gap-2.5">
-              <h2 className="text-lg font-black tracking-tight text-white">Ayakkabı Üretim Hattı</h2>
-              <span className={cn('inline-flex items-center gap-1.5 rounded-pill border px-2.5 py-0.5 text-2xs font-black', autoRefresh ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300' : 'border-slate-600/40 bg-slate-700/20 text-slate-400')}>
+              <h2 className="text-lg font-black tracking-tight text-fg-strong">Ayakkabı Üretim Hattı</h2>
+              <span className={cn('inline-flex items-center gap-1.5 rounded-pill border px-2.5 py-0.5 text-2xs font-black', autoRefresh ? 'border-success/30 bg-success-soft text-success' : 'border-line bg-surface-raised text-fg-muted')}>
                 <span className={cn('h-1.5 w-1.5 rounded-full', autoRefresh ? 'animate-pulse bg-emerald-400' : 'bg-slate-500')} />
                 Canlı İzleme
               </span>
@@ -189,14 +161,14 @@ export default function ProductionLineView({
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <span className="hidden items-center gap-1 text-2xs font-semibold text-slate-500 lg:inline-flex">
+          <span className="hidden items-center gap-1 text-2xs font-semibold text-fg-muted lg:inline-flex">
             <Clock className="h-3.5 w-3.5" /> {lastUpdated.toLocaleString('tr-TR', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
           </span>
           <button
             type="button"
             onClick={() => setAutoRefresh((v) => !v)}
             title={autoRefresh ? 'Otomatik yenilemeyi duraklat' : 'Otomatik yenilemeyi başlat'}
-            className="inline-flex h-9 items-center gap-1.5 rounded-control border border-slate-700 bg-slate-900 px-3 text-xs font-bold text-slate-200 hover:bg-slate-800 cursor-pointer"
+            className="inline-flex h-9 items-center gap-1.5 rounded-control border border-line bg-surface px-3 text-xs font-bold text-fg hover:bg-surface-hover cursor-pointer"
           >
             {autoRefresh ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
             <span className="hidden md:inline">{autoRefresh ? 'Duraklat' : 'Devam'}</span>
@@ -204,7 +176,7 @@ export default function ProductionLineView({
           <button
             type="button"
             onClick={manualRefresh}
-            className="inline-flex h-9 items-center gap-1.5 rounded-control border border-slate-700 bg-slate-900 px-3 text-xs font-bold text-slate-200 hover:bg-slate-800 cursor-pointer"
+            className="inline-flex h-9 items-center gap-1.5 rounded-control border border-line bg-surface px-3 text-xs font-bold text-fg hover:bg-surface-hover cursor-pointer"
           >
             <RefreshCw className={cn('h-4 w-4', loading && 'animate-spin')} />
             <span className="hidden md:inline">Yenile</span>
@@ -213,19 +185,21 @@ export default function ProductionLineView({
       </div>
 
       {/* Filtre çubuğu */}
-      <div className="mb-4 flex flex-wrap items-center gap-2 rounded-card border border-slate-800 bg-slate-900/60 p-2.5">
+      <div className="mb-4 flex flex-wrap items-center gap-2 rounded-card border border-line bg-surface-raised p-2.5">
         <input
           type="text"
+          aria-label="Üretim hattında ara"
           value={filters.search || ''}
           onChange={(e) => set('search', e.target.value)}
           placeholder="İş emri / sipariş / cari / renk / hat ara..."
-          className="h-9 min-w-[180px] flex-1 rounded-control border border-slate-700 bg-slate-950 px-3 text-xs font-bold text-slate-100 outline-none placeholder:text-slate-500 focus:border-cyan-500"
+          className="h-9 min-w-[180px] flex-1 rounded-control border border-line bg-surface px-3 text-xs font-bold text-fg-strong outline-none placeholder:text-fg-muted focus:border-brand"
         />
         {lines.length > 0 && (
           <select
+            aria-label="Üretim hattı"
             value={filters.line ?? ''}
             onChange={(e) => set('line', e.target.value || null)}
-            className="h-9 max-w-[170px] rounded-control border border-slate-700 bg-slate-950 px-2.5 text-xs font-bold text-slate-200 outline-none focus:border-cyan-500 cursor-pointer"
+            className="h-9 max-w-[170px] rounded-control border border-line bg-surface px-2.5 text-xs font-bold text-fg outline-none focus:border-brand cursor-pointer"
           >
             <option value="">Tüm Hatlar</option>
             {lines.map((l) => (
@@ -236,9 +210,10 @@ export default function ProductionLineView({
           </select>
         )}
         <select
+          aria-label="Model"
           value={filters.productId ?? ''}
           onChange={(e) => set('productId', e.target.value ? Number(e.target.value) : null)}
-          className="h-9 max-w-[160px] rounded-control border border-slate-700 bg-slate-950 px-2.5 text-xs font-bold text-slate-200 outline-none focus:border-cyan-500 cursor-pointer"
+          className="h-9 max-w-[160px] rounded-control border border-line bg-surface px-2.5 text-xs font-bold text-fg outline-none focus:border-brand cursor-pointer"
         >
           <option value="">Tüm Modeller</option>
           {products.map((p) => (
@@ -248,9 +223,10 @@ export default function ProductionLineView({
           ))}
         </select>
         <select
+          aria-label="Sipariş"
           value={filters.orderId ?? ''}
           onChange={(e) => set('orderId', e.target.value ? Number(e.target.value) : null)}
-          className="h-9 max-w-[150px] rounded-control border border-slate-700 bg-slate-950 px-2.5 text-xs font-bold text-slate-200 outline-none focus:border-cyan-500 cursor-pointer"
+          className="h-9 max-w-[150px] rounded-control border border-line bg-surface px-2.5 text-xs font-bold text-fg outline-none focus:border-brand cursor-pointer"
         >
           <option value="">Tüm Siparişler</option>
           {orders.map((o) => (
@@ -260,9 +236,10 @@ export default function ProductionLineView({
           ))}
         </select>
         <select
+          aria-label="Renk"
           value={filters.colorId ?? ''}
           onChange={(e) => set('colorId', e.target.value ? Number(e.target.value) : null)}
-          className="h-9 max-w-[140px] rounded-control border border-slate-700 bg-slate-950 px-2.5 text-xs font-bold text-slate-200 outline-none focus:border-cyan-500 cursor-pointer"
+          className="h-9 max-w-[140px] rounded-control border border-line bg-surface px-2.5 text-xs font-bold text-fg outline-none focus:border-brand cursor-pointer"
         >
           <option value="">Tüm Renkler</option>
           {colors.map((c) => (
@@ -272,9 +249,10 @@ export default function ProductionLineView({
           ))}
         </select>
         <select
+          aria-label="Beden"
           value={filters.size ?? ''}
           onChange={(e) => set('size', e.target.value || null)}
-          className="h-9 rounded-control border border-slate-700 bg-slate-950 px-2.5 text-xs font-bold text-slate-200 outline-none focus:border-cyan-500 cursor-pointer"
+          className="h-9 rounded-control border border-line bg-surface px-2.5 text-xs font-bold text-fg outline-none focus:border-brand cursor-pointer"
         >
           <option value="">Tüm Bedenler</option>
           {Array.from(new Set(workOrders.map((w) => w.size).filter(Boolean) as string[]))
@@ -285,7 +263,7 @@ export default function ProductionLineView({
               </option>
             ))}
         </select>
-        <div className="flex items-center gap-1 rounded-control bg-slate-950 p-1 ring-1 ring-slate-700">
+        <div className="flex items-center gap-1 rounded-control bg-surface-raised p-1 ring-1 ring-line">
           {([
             { id: 'all', label: 'Tümü' },
             { id: 'active', label: 'Aktif' },
@@ -297,7 +275,7 @@ export default function ProductionLineView({
               onClick={() => set('status', o.id)}
               className={cn(
                 'rounded-md px-2.5 py-1 text-2xs font-black uppercase cursor-pointer',
-                filters.status === o.id ? 'bg-cyan-500/20 text-cyan-200' : 'text-slate-400 hover:text-slate-200',
+                filters.status === o.id ? 'bg-brand-soft text-brand-fg' : 'text-fg-muted hover:text-fg',
               )}
             >
               {o.label}
@@ -308,7 +286,7 @@ export default function ProductionLineView({
           <button
             type="button"
             onClick={() => setFilters({ status: 'all' })}
-            className="inline-flex h-9 items-center gap-1 rounded-control px-2.5 text-2xs font-black uppercase text-slate-400 hover:text-rose-300 cursor-pointer"
+            className="inline-flex h-9 items-center gap-1 rounded-control px-2.5 text-2xs font-black uppercase text-fg-muted hover:text-danger cursor-pointer"
           >
             <X className="h-3.5 w-3.5" /> Temizle ({activeFilterCount})
           </button>
@@ -321,13 +299,13 @@ export default function ProductionLineView({
           {summary.stages.map((s) => {
             const a = STAGE_ACCENT[s.stage];
             return (
-              <div key={s.stage} className="flex w-[132px] shrink-0 flex-col items-center gap-1 rounded-card border border-slate-800 bg-slate-900/60 px-2 py-2.5">
+              <div key={s.stage} className="flex w-[132px] shrink-0 flex-col items-center gap-1 rounded-card border border-line bg-surface-raised px-2 py-2.5">
                 <Ring pct={s.completionPct} color={s.completionPct >= 100 && s.targetPairs > 0 ? '#34d399' : a.ring} size={46} stroke={5} />
                 <p className={cn('text-2xs font-black', a.text)}>{s.shortLabel}</p>
-                <p className="text-[10px] font-bold text-slate-400 tabular-nums">
-                  {formatPairs(s.producedPairs)} <span className="text-slate-600">/</span> {formatPairs(s.targetPairs)} ç
+                <p className="text-[10px] font-bold text-fg-muted tabular-nums">
+                  {formatPairs(s.producedPairs)} <span className="text-fg-muted">/</span> {formatPairs(s.targetPairs)} ç
                 </p>
-                <div className="h-1 w-full overflow-hidden rounded-full bg-slate-800">
+                <div className="h-1 w-full overflow-hidden rounded-full bg-line-strong">
                   <div className={cn('h-full rounded-full', a.bar)} style={{ width: `${s.completionPct}%` }} />
                 </div>
               </div>
@@ -337,10 +315,10 @@ export default function ProductionLineView({
       </div>
 
       {summary.totalWorkOrders === 0 ? (
-        <div className="flex flex-col items-center justify-center gap-2 rounded-card border border-dashed border-slate-700 bg-slate-900/40 py-16 text-center">
-          <Layers3 className="h-10 w-10 text-slate-600" />
-          <p className="text-sm font-black text-slate-300">Seçili filtrelerde gerçek üretim verisi yok</p>
-          <p className="max-w-md text-xs font-semibold text-slate-500">
+        <div className="flex flex-col items-center justify-center gap-2 rounded-card border border-dashed border-line bg-surface-raised py-16 text-center">
+          <Layers3 className="h-10 w-10 text-fg-muted" />
+          <p className="text-sm font-black text-fg">Seçili filtrelerde gerçek üretim verisi yok</p>
+          <p className="max-w-md text-xs font-semibold text-fg-muted">
             Hat, yalnızca ERP'deki iş emirlerinden beslenir. Veri yokken sahte değer gösterilmez. Filtreleri
             temizleyin veya üretime iş emri alın.
           </p>
@@ -351,7 +329,6 @@ export default function ProductionLineView({
           <div className="flex min-w-max items-stretch gap-0">
             {summary.stages.map((s, idx) => {
               const a = STAGE_ACCENT[s.stage];
-              const st = stageStatus(s);
               return (
                 <React.Fragment key={s.stage}>
                   <button
@@ -361,7 +338,7 @@ export default function ProductionLineView({
                       setDrawerTab('orders');
                     }}
                     className={cn(
-                      'group relative flex w-[210px] shrink-0 flex-col overflow-hidden rounded-card border border-t-2 border-slate-800 bg-slate-900 text-left transition-all hover:border-slate-600 hover:shadow-[0_0_0_1px_rgba(34,211,238,0.2)]',
+                      'group relative flex w-[210px] shrink-0 flex-col overflow-hidden rounded-card border border-t-2 border-line bg-surface text-left transition-all hover:border-line-strong hover:shadow-[0_0_0_1px_rgba(34,211,238,0.2)]',
                     )}
                     style={{ borderTopColor: a.ring }}
                   >
@@ -371,7 +348,7 @@ export default function ProductionLineView({
                         <span className={cn('flex h-6 w-6 items-center justify-center rounded-lg text-2xs font-black', a.soft, a.text)}>
                           {idx + 1}
                         </span>
-                        <span className="text-sm font-black text-white">{s.shortLabel}</span>
+                        <span className="text-sm font-black text-fg-strong">{s.shortLabel}</span>
                       </div>
                       <span className={cn('text-base font-black tabular-nums', a.text)}>%{s.completionPct}</span>
                     </div>
@@ -389,7 +366,7 @@ export default function ProductionLineView({
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent" />
                       {s.isBottleneck && (
-                        <span className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-pill border border-rose-500/40 bg-rose-500/20 px-2 py-0.5 text-[9px] font-black uppercase text-rose-300">
+                        <span className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-pill border border-danger/30 bg-danger-soft px-2 py-0.5 text-[9px] font-black uppercase text-danger">
                           <AlertTriangle className="h-3 w-3" /> darboğaz
                         </span>
                       )}
@@ -397,7 +374,7 @@ export default function ProductionLineView({
 
                     {/* İlerleme çubuğu */}
                     <div className="px-3 pt-2">
-                      <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-800">
+                      <div className="h-1.5 w-full overflow-hidden rounded-full bg-line-strong">
                         <div className={cn('h-full rounded-full transition-all duration-700', a.bar)} style={{ width: `${s.completionPct}%` }} />
                       </div>
                     </div>
@@ -422,7 +399,7 @@ export default function ProductionLineView({
         </div>
       )}
 
-      <p className="mt-3 flex items-center gap-1.5 text-2xs font-semibold text-slate-500">
+      <p className="mt-3 flex items-center gap-1.5 text-2xs font-semibold text-fg-muted">
         <Clock className="h-3 w-3" /> Süre pill'leri gerçek aşama başlangıç/bitiş kayıtlarından türetilir; kayıt yoksa "—".
         Veriler ERP iş emirlerinden beslenir, makine/sensör verisi içermez.
       </p>
@@ -435,7 +412,7 @@ export default function ProductionLineView({
         title={selectedCfg ? `${selectedCfg.label} — Üretim Emirleri` : ''}
         badge={
           selectedSummary && (
-            <span className="text-2xs font-black text-slate-400">
+            <span className="text-2xs font-black text-fg-muted">
               {selectedWos.length} iş emri · {formatPairs(stageProduced)} çift üretilen
             </span>
           )
@@ -456,9 +433,11 @@ export default function ProductionLineView({
               ))}
             </div>
 
-            <DarkTabs
+            <Tabs
               value={drawerTab}
               onChange={setDrawerTab}
+              size="sm"
+              ariaLabel="Proses ayrıntıları"
               items={[
                 { key: 'orders', label: 'İş Emirleri' },
                 { key: 'machine', label: 'Makine Planı' },
@@ -503,10 +482,10 @@ export default function ProductionLineView({
                                 className={cn(
                                   'inline-flex items-center gap-1 rounded-pill px-2 py-0.5 text-[10px] font-black',
                                   log?.status === 'completed' || wo.status === 'completed'
-                                    ? 'bg-emerald-500/15 text-emerald-300'
+                                    ? 'bg-success-soft text-success'
                                     : wo.status === 'in_progress'
-                                      ? 'bg-cyan-500/15 text-cyan-300'
-                                      : 'bg-slate-500/15 text-slate-300',
+                                      ? 'bg-brand-soft text-brand-fg'
+                                      : 'bg-surface-hover text-fg',
                                 )}
                               >
                                 {log?.status === 'completed' || wo.status === 'completed' ? (
@@ -574,7 +553,7 @@ export default function ProductionLineView({
                   {stageQuality.map((q) => (
                     <div key={q.id} className="flex items-center justify-between gap-2 rounded-control border border-line bg-surface-hover/50 px-3 py-1.5">
                       <span className="inline-flex min-w-0 items-center gap-1.5 text-xs font-bold text-fg-strong">
-                        <ShieldCheck className={cn('h-3.5 w-3.5 shrink-0', q.result === 'pass' ? 'text-emerald-400' : 'text-rose-400')} />
+                        <ShieldCheck className={cn('h-3.5 w-3.5 shrink-0', q.result === 'pass' ? 'text-success' : 'text-danger')} />
                         <span className="truncate font-mono">{q.barcode}</span>
                       </span>
                       <span className="shrink-0 text-2xs font-bold text-fg-muted">

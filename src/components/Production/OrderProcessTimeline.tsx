@@ -7,6 +7,7 @@ import { LINE_PROCESS_STAGES, stageOrderOf, filterWorkOrders, type LineFilters }
 import { PRODUCTION_STAGES_CONFIG } from '../../services/productionService';
 import { STAGE_ACCENT } from './productionLineStages';
 import { SectionBand } from './ProductionLineShared';
+import Tabs from '../Common/Tabs';
 
 function fmt(d?: string | Date): string {
   if (!d) return '—';
@@ -73,23 +74,24 @@ export default function OrderProcessTimeline({ workOrders, products }: Props) {
   }, [selected]);
 
   return (
-    <div className="-m-4 min-h-full bg-slate-950 p-4 text-slate-100 sm:-m-6 sm:p-6">
+    <div className="rounded-card border border-line bg-surface p-4 text-fg sm:p-6">
       <SectionBand index={2} title="Süreç Zaman Çizelgesi" desc="İş emri özelinde proses akışı ve durum takibi — gerçek aşama kayıtları" />
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-[280px_1fr]">
         {/* Sol: iş emri seçici */}
-        <div className="rounded-card border border-slate-800 bg-slate-900/60 p-2">
+        <div className="rounded-card border border-line bg-surface-raised p-2">
           <div className="relative mb-2">
-            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-fg-muted" />
             <input
+              aria-label="İş emri ara"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="İş emri / sipariş / renk ara..."
-              className="h-9 w-full rounded-control border border-slate-700 bg-slate-950 pl-8 pr-2 text-xs font-bold text-slate-100 outline-none placeholder:text-slate-500 focus:border-cyan-500"
+              className="h-9 w-full rounded-control border border-line bg-surface pl-8 pr-2 text-xs font-bold text-fg-strong outline-none placeholder:text-fg-muted focus:border-brand"
             />
           </div>
           <div className="max-h-[560px] space-y-1 overflow-y-auto pr-1">
-            {list.length === 0 && <p className="p-3 text-center text-xs font-semibold text-slate-500">İş emri yok.</p>}
+            {list.length === 0 && <p className="p-3 text-center text-xs font-semibold text-fg-muted">İş emri yok.</p>}
             {list.map((wo) => {
               const p = productMap.get(wo.productId);
               const active = selected?.id === wo.id;
@@ -100,16 +102,16 @@ export default function OrderProcessTimeline({ workOrders, products }: Props) {
                   onClick={() => setSelectedId(wo.id!)}
                   className={cn(
                     'flex w-full items-center gap-2 rounded-control px-2.5 py-2 text-left transition-colors cursor-pointer',
-                    active ? 'bg-cyan-500/15 ring-1 ring-cyan-500/40' : 'hover:bg-slate-800',
+                    active ? 'bg-brand-soft ring-1 ring-brand/30' : 'hover:bg-surface-hover',
                   )}
                 >
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-xs font-black text-white">{wo.barcode}</p>
-                    <p className="truncate text-2xs font-semibold text-slate-400">
+                    <p className="truncate text-xs font-black text-fg-strong">{wo.barcode}</p>
+                    <p className="truncate text-2xs font-semibold text-fg-muted">
                       {p?.name || '—'} · {[wo.color, wo.size].filter(Boolean).join('/')}
                     </p>
                   </div>
-                  <span className="shrink-0 text-2xs font-bold text-slate-500">{stageCfg(wo.currentStage)?.shortLabel}</span>
+                  <span className="shrink-0 text-2xs font-bold text-fg-muted">{stageCfg(wo.currentStage)?.shortLabel}</span>
                 </button>
               );
             })}
@@ -119,24 +121,24 @@ export default function OrderProcessTimeline({ workOrders, products }: Props) {
         {/* Sağ: çizelge */}
         <div className="space-y-4">
           {!selected ? (
-            <div className="rounded-card border border-slate-800 bg-slate-900/60 p-4">
-              <p className="py-16 text-center text-sm font-semibold text-slate-500">Görüntülemek için bir iş emri seçin.</p>
+            <div className="rounded-card border border-line bg-surface-raised p-4">
+              <p className="py-16 text-center text-sm font-semibold text-fg-muted">Görüntülemek için bir iş emri seçin.</p>
             </div>
           ) : (
             <>
               {/* Künye kartı (mockup #2 üst bandı) */}
-              <div className="rounded-card border border-slate-800 bg-slate-900/60 p-4">
+              <div className="rounded-card border border-line bg-surface-raised p-4">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <h3 className="text-xl font-black tracking-tight text-white">{selected.barcode}</h3>
+                    <h3 className="text-xl font-black tracking-tight text-fg-strong">{selected.barcode}</h3>
                     <span
                       className={cn(
                         'rounded-pill border px-2.5 py-0.5 text-2xs font-black',
                         selected.status === 'completed'
-                          ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300'
+                          ? 'border-emerald-500/30 bg-emerald-500/10 text-success'
                           : selected.status === 'in_progress'
-                            ? 'border-cyan-500/30 bg-cyan-500/10 text-cyan-300'
-                            : 'border-slate-500/30 bg-slate-500/10 text-slate-300',
+                            ? 'border-cyan-500/30 bg-cyan-500/10 text-brand-fg'
+                            : 'border-slate-500/30 bg-slate-500/10 text-fg',
                       )}
                     >
                       {selected.status === 'completed' ? 'Tamamlandı' : selected.status === 'in_progress' ? 'Üretimde' : 'Planlandı'}
@@ -150,13 +152,13 @@ export default function OrderProcessTimeline({ workOrders, products }: Props) {
                       { label: 'Termin', value: selected.targetDate ? new Date(selected.targetDate).toLocaleDateString('tr-TR') : '—' },
                     ].map((b) => (
                       <div key={b.label}>
-                        <p className="text-[9px] font-bold uppercase tracking-wide text-slate-500">{b.label}</p>
-                        <p className="truncate text-xs font-black text-white">{b.value}</p>
+                        <p className="text-[9px] font-bold uppercase tracking-wide text-fg-muted">{b.label}</p>
+                        <p className="truncate text-xs font-black text-fg-strong">{b.value}</p>
                       </div>
                     ))}
                   </div>
                 </div>
-                <p className="mt-2 text-2xs font-semibold text-slate-500">
+                <p className="mt-2 text-2xs font-semibold text-fg-muted">
                   {[selected.orderNumber && `Sipariş ${selected.orderNumber}`, selected.color, selected.size, selected.line && `Hat: ${selected.line}`]
                     .filter(Boolean)
                     .join(' · ') || '—'}
@@ -164,28 +166,17 @@ export default function OrderProcessTimeline({ workOrders, products }: Props) {
               </div>
 
               {/* Sekme şeridi */}
-              <div className="flex items-center gap-1 border-b border-slate-800">
-                {([
-                  { id: 'flow', label: 'Proses Akışı' },
-                  { id: 'detail', label: 'Proses Detayları' },
-                ] as const).map((t) => (
-                  <button
-                    key={t.id}
-                    type="button"
-                    onClick={() => setTab(t.id)}
-                    className={cn(
-                      'border-b-2 px-3 py-2 text-xs font-black transition-colors cursor-pointer',
-                      tab === t.id ? 'border-cyan-400 text-cyan-300' : 'border-transparent text-slate-500 hover:text-slate-300',
-                    )}
-                  >
-                    {t.label}
-                  </button>
-                ))}
-              </div>
+              <Tabs
+                items={[{ key: 'flow', label: 'Proses Akışı' }, { key: 'detail', label: 'Proses Detayları' }]}
+                value={tab}
+                onChange={(key) => setTab(key as 'flow' | 'detail')}
+                size="sm"
+                ariaLabel="İş emri süreç görünümleri"
+              />
 
               {tab === 'flow' ? (
                 /* Yatay stepper (mockup #2) */
-                <div className="overflow-x-auto rounded-card border border-slate-800 bg-slate-900/60 p-4">
+                <div className="overflow-x-auto rounded-card border border-line bg-surface-raised p-4">
                   <div className="flex min-w-max items-start">
                     {rows.map((r, i) => {
                       const a = STAGE_ACCENT[r.stageId as keyof typeof STAGE_ACCENT];
@@ -195,8 +186,8 @@ export default function OrderProcessTimeline({ workOrders, products }: Props) {
                           <div className="flex w-[120px] flex-col items-center text-center">
                             <div
                               className={cn(
-                                'relative h-[84px] w-[104px] overflow-hidden rounded-xl border bg-slate-950',
-                                r.done ? 'border-emerald-500/40' : r.running ? 'border-cyan-500/50' : 'border-slate-800',
+                                'relative h-[84px] w-[104px] overflow-hidden rounded-xl border bg-surface-raised',
+                                r.done ? 'border-emerald-500/40' : r.running ? 'border-cyan-500/50' : 'border-line',
                               )}
                             >
                               {p?.image ? (
@@ -217,23 +208,23 @@ export default function OrderProcessTimeline({ workOrders, products }: Props) {
                                 </span>
                               )}
                             </div>
-                            <p className="mt-2 text-xs font-black text-white">{r.cfg?.shortLabel}</p>
-                            <p className={cn('text-sm font-black tabular-nums', r.done ? 'text-emerald-400' : r.running ? a.text : 'text-slate-500')}>
+                            <p className="mt-2 text-xs font-black text-fg-strong">{r.cfg?.shortLabel}</p>
+                            <p className={cn('text-sm font-black tabular-nums', r.done ? 'text-success' : r.running ? a.text : 'text-fg-muted')}>
                               %{r.pct}
                             </p>
-                            <p className={cn('text-[10px] font-bold', r.done ? 'text-emerald-400' : r.running ? a.text : 'text-slate-500')}>
+                            <p className={cn('text-[10px] font-bold', r.done ? 'text-success' : r.running ? a.text : 'text-fg-muted')}>
                               {r.done ? 'Tamamlandı' : r.running ? 'Devam Ediyor' : 'Bekliyor'}
                             </p>
-                            <p className="mt-0.5 text-[9px] font-semibold text-slate-500">
+                            <p className="mt-0.5 text-[9px] font-semibold text-fg-muted">
                               {r.log?.startedAt ? fmt(r.log.startedAt) : '—'}
                             </p>
-                            <p className="text-[9px] font-semibold text-slate-500 tabular-nums">
+                            <p className="text-[9px] font-semibold text-fg-muted tabular-nums">
                               {formatPairs(r.produced)}/{formatPairs(selected.quantity)} ç
                             </p>
                           </div>
                           {i < rows.length - 1 && (
                             <div className="mt-[42px] flex w-6 shrink-0 items-center justify-center">
-                              <ArrowRight className={cn('h-4 w-4', r.done ? 'text-emerald-500' : 'text-slate-700')} />
+                              <ArrowRight className={cn('h-4 w-4', r.done ? 'text-emerald-500' : 'text-fg-muted')} />
                             </div>
                           )}
                         </React.Fragment>
@@ -243,10 +234,10 @@ export default function OrderProcessTimeline({ workOrders, products }: Props) {
                 </div>
               ) : (
                 /* Proses detay tablosu */
-                <div className="overflow-x-auto rounded-card border border-slate-800 bg-slate-900/60 p-3">
+                <div className="overflow-x-auto rounded-card border border-line bg-surface-raised p-3">
                   <table className="w-full text-left text-2xs font-bold">
                     <thead>
-                      <tr className="border-b border-slate-800 text-slate-500">
+                      <tr className="border-b border-line text-fg-muted">
                         {['Proses', 'Durum', 'Başlangıç', 'Bitiş', 'Süre', 'Üretilen', 'Fire', 'Personel'].map((h) => (
                           <th key={h} className="px-2 py-1.5 whitespace-nowrap uppercase">
                             {h}
@@ -258,9 +249,9 @@ export default function OrderProcessTimeline({ workOrders, products }: Props) {
                       {rows.map((r) => {
                         const a = STAGE_ACCENT[r.stageId as keyof typeof STAGE_ACCENT];
                         return (
-                          <tr key={r.stageId} className="border-b border-slate-800/60 last:border-0">
+                          <tr key={r.stageId} className="border-b border-line/60 last:border-0">
                             <td className="px-2 py-2">
-                              <span className={cn('inline-flex items-center gap-1.5 font-black text-white')}>
+                              <span className={cn('inline-flex items-center gap-1.5 font-black text-fg-strong')}>
                                 <span className={cn('h-2 w-2 rounded-full', a.dot)} />
                                 {r.cfg?.label}
                               </span>
@@ -269,28 +260,28 @@ export default function OrderProcessTimeline({ workOrders, products }: Props) {
                               <span
                                 className={cn(
                                   'rounded-pill px-2 py-0.5 text-[10px] font-black',
-                                  r.done ? 'bg-emerald-500/15 text-emerald-300' : r.running ? 'bg-cyan-500/15 text-cyan-300' : 'bg-slate-700/30 text-slate-400',
+                                  r.done ? 'bg-success-soft text-success' : r.running ? 'bg-brand-soft text-brand-fg' : 'bg-surface-hover text-fg-muted',
                                 )}
                               >
                                 {r.done ? 'Tamamlandı' : r.running ? 'Devam Ediyor' : 'Bekliyor'}
                               </span>
                             </td>
-                            <td className="px-2 py-2 whitespace-nowrap text-slate-300">{fmt(r.log?.startedAt)}</td>
-                            <td className="px-2 py-2 whitespace-nowrap text-slate-300">{fmt(r.log?.completedAt)}</td>
-                            <td className="px-2 py-2 whitespace-nowrap text-slate-300">{fmtDur(r.log?.startedAt, r.log?.completedAt)}</td>
-                            <td className="px-2 py-2 tabular-nums text-white">
-                              {formatPairs(r.produced)} <span className="text-slate-500">/ {formatPairs(selected.quantity)}</span>
+                            <td className="px-2 py-2 whitespace-nowrap text-fg">{fmt(r.log?.startedAt)}</td>
+                            <td className="px-2 py-2 whitespace-nowrap text-fg">{fmt(r.log?.completedAt)}</td>
+                            <td className="px-2 py-2 whitespace-nowrap text-fg">{fmtDur(r.log?.startedAt, r.log?.completedAt)}</td>
+                            <td className="px-2 py-2 tabular-nums text-fg-strong">
+                              {formatPairs(r.produced)} <span className="text-fg-muted">/ {formatPairs(selected.quantity)}</span>
                             </td>
                             <td className="px-2 py-2 tabular-nums">
                               {r.log?.scrapQuantity ? (
-                                <span className="inline-flex items-center gap-1 font-black text-amber-300">
+                                <span className="inline-flex items-center gap-1 font-black text-warning">
                                   <AlertTriangle className="h-3 w-3" /> {formatPairs(r.log.scrapQuantity)}
                                 </span>
                               ) : (
-                                <span className="text-slate-500">—</span>
+                                <span className="text-fg-muted">—</span>
                               )}
                             </td>
-                            <td className="px-2 py-2 text-slate-300">{r.log?.operator || '—'}</td>
+                            <td className="px-2 py-2 text-fg">{r.log?.operator || '—'}</td>
                           </tr>
                         );
                       })}

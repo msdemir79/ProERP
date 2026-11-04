@@ -1,5 +1,5 @@
 /**
- * ProERP Faz 6 — Kalıp (last) takip modülü testleri.
+ * DMR Nexus Faz 6 — Kalıp (last) takip modülü testleri.
  *
  * Gerçek HTTP + gerçek MySQL + gerçek RBAC/op yolu üzerinde, harness'ın mint
  * ettiği super_admin oturumuyla koşar. Kalıp modülünün uçtan uca garantilerini
@@ -139,7 +139,7 @@ async function createWorkOrder(productId: number): Promise<number> {
 async function main(): Promise<void> {
   srv = await startTestServer(1);
   console.log('\n======================================================');
-  console.log(' PROERP FAZ 6 — KALIP TAKİP MODÜLÜ TESTLERİ');
+  console.log(' DMR NEXUS FAZ 6 — KALIP TAKİP MODÜLÜ TESTLERİ');
   console.log(` Hedef: ${srv.baseUrl} (canlı DB, in-process oturum)`);
   console.log('======================================================\n');
 

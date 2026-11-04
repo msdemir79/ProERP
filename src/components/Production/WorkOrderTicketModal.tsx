@@ -185,7 +185,7 @@ export default function WorkOrderTicketModal({
           <div id="printable-ticket" className="bg-white dark:bg-slate-900 p-6 rounded-3xl border-2 border-slate-900 space-y-4 text-black">
             <div className="flex items-center justify-between border-b-2 border-black pb-3">
               <div>
-                <h3 className="text-xl font-black uppercase tracking-tight">PRO-ERP İŞ EMRİ REFAKAT KARTI</h3>
+                <h3 className="text-xl font-black uppercase tracking-tight">DMR NEXUS İŞ EMRİ REFAKAT KARTI</h3>
                 <p className="text-[10px] font-mono font-bold">TAKİP NO: {workOrder.barcode}</p>
               </div>
               <div className="text-right">

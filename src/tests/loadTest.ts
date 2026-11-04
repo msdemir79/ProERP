@@ -1,5 +1,5 @@
 /**
- * ProERP Faz 4 — Load Testi (item 10): YAZMA uçları.
+ * DMR Nexus Faz 4 — Load Testi (item 10): YAZMA uçları.
  *
  * In-process harness sunucusuna (gerçek API + gerçek MySQL + RBAC) eşzamanlı
  * POST/PATCH/DELETE istekleri gönderir; gecikme yüzdeliklerini (p50/p90/p95/p99),
@@ -40,7 +40,7 @@ function reportPhase(name: string, res: { latencies: number[]; errors: number; d
 async function main(): Promise<void> {
   srv = await startTestServer(1);
   console.log('\n======================================================');
-  console.log(' PROERP FAZ 4 — LOAD TESTİ (YAZMA UÇLARI)');
+  console.log(' DMR NEXUS FAZ 4 — LOAD TESTİ (YAZMA UÇLARI)');
   console.log(` Hedef: ${srv.baseUrl} | İstek/faz: ${N} | Eşzamanlılık: ${C}`);
   console.log('======================================================');
 

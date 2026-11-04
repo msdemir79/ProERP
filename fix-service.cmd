@@ -1,6 +1,6 @@
 @echo off
 REM ============================================================================
-REM  ProERP - Yonetici Onarim Betigi
+REM  DMR Nexus - Yonetici Onarim Betigi
 REM
 REM  NEDEN GEREKLI: E:\ProERP uzerindeki DSH kum havuzu, alt sureclerin (npm,
 REM  vite, tsc) proje klasorlerine yazmasini engelleyen bir Windows butunluk
@@ -9,7 +9,7 @@ REM    (1) NSSM servis yapilandirmasinin duzeltilmesi  -> uygulama kapali
 REM    (2) @types/react kurulumu ve uretim derlemesi   -> npm node_modules'a yazamadi
 REM
 REM  Bu betik SADECE su degisiklikleri yapar:
-REM    - ProERP servisinin baslatma komutunu duzeltir (tirnak hatasi giderilir)
+REM    - ProERP adli Windows hizmetinin baslatma komutunu duzeltir (tirnak hatasi giderilir)
 REM    - @types/react + @types/react-dom kurar (gelistirme bagimliligi)
 REM    - Uretim derlemesini olusturur (dist/)
 REM    - Servisi baslatir ve saglik kontrolu yapar
@@ -27,7 +27,7 @@ set "NODE=C:\Program Files\nodejs\node.exe"
 
 echo.
 echo ============================================================
-echo  ProERP Onarim - Baslangic
+echo  DMR Nexus Onarim - Baslangic
 echo ============================================================
 echo.
 

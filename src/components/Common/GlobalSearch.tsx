@@ -66,10 +66,10 @@ export default function GlobalSearch() {
     }
     if (enabled) {
       for (const p of products || []) {
-        list.push({ id: `p-${p.id}`, label: p.name, sub: p.code, href: '/inventory', kind: 'product' });
+        list.push({ id: `p-${p.id}`, label: p.name, sub: p.code, href: `/inventory?productId=${p.id}`, kind: 'product' });
       }
       for (const c of contacts || []) {
-        list.push({ id: `c-${c.id}`, label: c.name, sub: c.code, href: '/contacts', kind: 'contact' });
+        list.push({ id: `c-${c.id}`, label: c.name, sub: c.code, href: `/contacts?contactId=${c.id}`, kind: 'contact' });
       }
     }
     return list.slice(0, 12);

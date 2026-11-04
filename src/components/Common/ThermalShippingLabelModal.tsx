@@ -253,7 +253,7 @@ export const ThermalShippingLabelModal: React.FC<ThermalShippingLabelProps> = ({
               {/* Sender */}
               <div className="border-r border-black pr-2">
                 <span className="font-black block uppercase text-[9px] text-slate-600">GÖNDERİCİ:</span>
-                <p className="font-black text-[11px] uppercase">PROERP AYAKKABI SAN. LTD.</p>
+                <p className="font-black text-[11px] uppercase">DMR NEXUS</p>
                 <p className="mt-0.5">İkitelli OSB 12. Cad. No:45</p>
                 <p>Başakşehir / İSTANBUL</p>
                 <p className="font-mono">VKN: 7340592811 | (0212) 555 0199</p>
@@ -340,7 +340,7 @@ export const ThermalShippingLabelModal: React.FC<ThermalShippingLabelProps> = ({
               </div>
 
               <div className="text-right">
-                <p className="text-[8px] font-black uppercase">PROERP İMALAT & LOJİSTİK</p>
+                <p className="text-[8px] font-black uppercase">DMR NEXUS İMALAT & LOJİSTİK</p>
                 <p className="text-[7px] text-slate-600">Bu koli kalite kontrol onayından geçmiştir.</p>
               </div>
             </div>

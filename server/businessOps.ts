@@ -2425,15 +2425,24 @@ export function createBusinessOpsRouter(): { router: Router; deleteEffects: Dele
   ): Promise<void> {
     const orderRows = await conn.query<any[]>('SELECT `id`, `invoicedTotal` FROM `orders` WHERE `id` = ? FOR UPDATE', [orderId]);
     const order = (orderRows[0] as any[])[0];
-    if (!order) return;
+    if (!order) {
+      if (direction === 1) throw new OpError(404, 'Faturanın bağlı olduğu sipariş bulunamadı.', 'INVOICE_ORDER_NOT_FOUND');
+      return;
+    }
     const oiRows = await conn.query<any[]>('SELECT `id`, `quantity`, `invoicedQuantity` FROM `orderItems` WHERE `orderId` = ? FOR UPDATE', [orderId]);
     const orderItems = (oiRows[0] as any[]) || [];
     for (const it of items) {
       if (!it?.orderItemId) continue;
       const t = orderItems.find((oi) => Number(oi.id) === Number(it.orderItemId));
-      if (!t) continue;
+      if (!t) {
+        if (direction === 1) throw new OpError(409, 'Fatura satırı bağlı siparişe ait değil.', 'INVOICE_ORDER_ITEM_MISMATCH');
+        continue;
+      }
       const prev = Number(t.invoicedQuantity) || 0;
       const nextQ = Math.max(0, prev + direction * (Number(it.quantity) || 0));
+      if (direction === 1 && nextQ > Number(t.quantity) + 0.00001) {
+        throw new OpError(409, 'Fatura miktarı siparişin kalan miktarını aşıyor.', 'INVOICE_ORDER_QUANTITY_EXCEEDED');
+      }
       await conn.query('UPDATE `orderItems` SET `invoicedQuantity` = ? WHERE `id` = ?', [nextQ, t.id]);
       t.invoicedQuantity = nextQ;
     }
@@ -2456,16 +2465,16 @@ export function createBusinessOpsRouter(): { router: Router; deleteEffects: Dele
   /**
    * İrsaliyeyi faturaya bağlamadan önce satır kilidiyle doğrular:
    * aynı irsaliyenin ikinci bir faturaya aktarılmasını, iptal edilmiş
-   * irsaliyenin bağlanmasını ve cari/tip uyuşmazlığını reddeder.
+    * irsaliyenin bağlanmasını, cari/tip uyuşmazlığını ve çift stok hareketini reddeder.
    */
   async function lockWaybillForInvoice(
     conn: PoolConnection,
     waybillId: number,
-    invoice: { contactId: number; type: string },
+    invoice: { contactId: number; type: string; isStockDeducted: boolean },
     selfInvoiceId?: number,
-  ): Promise<{ id: number; waybillNumber: string }> {
+  ): Promise<{ id: number; waybillNumber: string; orderId: number | null }> {
     const rows = await conn.query<any[]>(
-      'SELECT `id`, `waybillNumber`, `status`, `invoicedStatus`, `invoiceId`, `invoiceNumber`, `contactId`, `type` FROM `waybills` WHERE `id` = ? FOR UPDATE',
+      'SELECT `id`, `waybillNumber`, `status`, `invoicedStatus`, `invoiceId`, `invoiceNumber`, `contactId`, `type`, `orderId`, `isStockDeducted` FROM `waybills` WHERE `id` = ? FOR UPDATE',
       [waybillId],
     );
     const wb = (rows[0] as any[])[0];
@@ -2487,7 +2496,100 @@ export function createBusinessOpsRouter(): { router: Router; deleteEffects: Dele
     if (String(wb.type) !== String(invoice.type)) {
       throw new OpError(400, `"${wb.waybillNumber}" irsaliyesi ${wb.type === 'sales' ? 'satış' : 'alış'} tipinde; fatura tipi irsaliye ile eşleşmelidir.`, 'WAYBILL_TYPE_MISMATCH');
     }
-    return { id: Number(wb.id), waybillNumber: String(wb.waybillNumber) };
+    // İrsaliye taslak olsa bile kesinleştiğinde stok hareketi üretebilir.
+    // İki belgenin aynı fiziksel hareketi işlemesine hiçbir yaşam döngüsünde izin verme.
+    if (Number(wb.isStockDeducted) === 1 && invoice.isStockDeducted) {
+      throw new OpError(409, `"${wb.waybillNumber}" irsaliyesi stok hareketini zaten üstleniyor; bağlı faturada stok hareketini kapatın.`, 'INVOICE_WAYBILL_STOCK_ALREADY_APPLIED');
+    }
+    return { id: Number(wb.id), waybillNumber: String(wb.waybillNumber), orderId: wb.orderId == null ? null : Number(wb.orderId) };
+  }
+
+  /** Kesinleşen faturanın belge satırlarını kilit altında doğrular. */
+  async function validateInvoiceLinks(
+    conn: PoolConnection,
+    invoice: { orderId: number | null; waybillId: number | null; contactId: number; type: string },
+    items: any[],
+    waybill?: { id: number; waybillNumber: string; orderId: number | null },
+  ): Promise<void> {
+    const variant = (line: any) => `${String(line.color ?? '')}\u0000${String(line.size ?? '')}`;
+    if (invoice.waybillId) {
+      if (!waybill) throw new OpError(409, 'İrsaliye bağlantısı doğrulanamadı.', 'INVOICE_WAYBILL_MISMATCH');
+      if (waybill.orderId !== invoice.orderId) {
+        throw new OpError(409, 'Fatura siparişi ile irsaliyenin siparişi farklı.', 'INVOICE_WAYBILL_ORDER_MISMATCH');
+      }
+      const [rawWaybillItems] = await conn.query<any[]>(
+        'SELECT `productId`, `orderItemId`, `color`, `size`, `quantity`, `productCode`, `productName` FROM `waybillItems` WHERE `waybillId` = ? FOR UPDATE',
+        [waybill.id],
+      );
+      const waybillItems = (rawWaybillItems as any[]) || [];
+      const keyOf = (line: any) => JSON.stringify([
+        line.productId == null ? null : Number(line.productId),
+        line.orderItemId == null ? null : Number(line.orderItemId),
+        variant(line),
+        line.productId == null ? String(line.productCode ?? '') : '',
+        line.productId == null ? String(line.productName ?? '') : '',
+      ]);
+      const received = new Map<string, number>();
+      const invoiced = new Map<string, number>();
+      for (const line of waybillItems) received.set(keyOf(line), (received.get(keyOf(line)) || 0) + Number(line.quantity));
+      for (const line of items) {
+        const key = keyOf(line);
+        if (!received.has(key)) {
+          // İrsaliyeye ek olarak yalnız stoksuz hizmet/gider satırları faturalanabilir.
+          if (line.productId == null && line.orderItemId == null) continue;
+          throw new OpError(409, 'Faturadaki ürün/renk/beden irsaliye satırlarıyla uyuşmuyor.', 'INVOICE_WAYBILL_ITEM_MISMATCH');
+        }
+        invoiced.set(key, (invoiced.get(key) || 0) + Number(line.quantity));
+      }
+      for (const [key, quantity] of received) {
+        if (Math.abs((invoiced.get(key) || 0) - quantity) > 0.00001) {
+          throw new OpError(409, 'İrsaliye miktarı faturaya eksik veya fazla aktarıldı.', 'INVOICE_WAYBILL_QUANTITY_MISMATCH');
+        }
+      }
+    }
+
+    if (!invoice.orderId) {
+      if (items.some(line => line.orderItemId != null)) {
+        throw new OpError(409, 'Fatura satırında sipariş kalemi var ancak sipariş bağlantısı yok.', 'INVOICE_ORDER_REQUIRED');
+      }
+      return;
+    }
+    const [orderRows] = await conn.query<any[]>(
+      'SELECT `id`, `contactId`, `type`, `status` FROM `orders` WHERE `id` = ? FOR UPDATE',
+      [invoice.orderId],
+    );
+    const order = (orderRows as any[])[0];
+    if (!order) throw new OpError(404, 'Faturaya bağlı sipariş bulunamadı.', 'INVOICE_ORDER_NOT_FOUND');
+    if (Number(order.contactId) !== invoice.contactId || String(order.type) !== invoice.type) {
+      throw new OpError(409, 'Fatura ve siparişin cari hesabı veya tipi uyuşmuyor.', 'INVOICE_ORDER_MISMATCH');
+    }
+    if (order.status === 'draft' || order.status === 'cancelled') {
+      throw new OpError(409, 'Taslak veya iptal edilmiş sipariş faturalanamaz.', 'INVOICE_ORDER_INACTIVE');
+    }
+    const [rawOrderItems] = await conn.query<any[]>(
+      'SELECT `id`, `productId`, `color`, `size`, `quantity`, `invoicedQuantity` FROM `orderItems` WHERE `orderId` = ? FOR UPDATE',
+      [invoice.orderId],
+    );
+    const orderItems = new Map<number, any>((rawOrderItems as any[]).map(line => [Number(line.id), line]));
+    const quantities = new Map<number, number>();
+    for (const line of items) {
+      if (line.orderItemId == null) {
+        if (line.productId != null) throw new OpError(409, 'Sipariş bağlantılı üründe sipariş kalemi zorunludur.', 'INVOICE_ORDER_ITEM_REQUIRED');
+        continue;
+      }
+      const id = Number(line.orderItemId);
+      const ordered = orderItems.get(id);
+      if (!ordered || Number(ordered.productId) !== Number(line.productId) || variant(ordered) !== variant(line)) {
+        throw new OpError(409, 'Fatura satırı sipariş ürünü/renk/bedeniyle uyuşmuyor.', 'INVOICE_ORDER_ITEM_MISMATCH');
+      }
+      quantities.set(id, (quantities.get(id) || 0) + Number(line.quantity));
+    }
+    for (const [id, quantity] of quantities) {
+      const ordered = orderItems.get(id)!;
+      if (Number(ordered.invoicedQuantity) + quantity > Number(ordered.quantity) + 0.00001) {
+        throw new OpError(409, 'Fatura miktarı siparişin kalan miktarını aşıyor.', 'INVOICE_ORDER_QUANTITY_EXCEEDED');
+      }
+    }
   }
 
   /**
@@ -2642,7 +2744,10 @@ export function createBusinessOpsRouter(): { router: Router; deleteEffects: Dele
       if (!Number.isFinite(contactId) || contactId <= 0) throw new OpError(400, 'Geçerli bir cari hesap seçilmelidir.');
       let invoiceNumber = String(invoice.invoiceNumber || '').trim();
       if (type === 'purchase' && !invoiceNumber) throw new OpError(400, 'Tedarikçi fatura numarası zorunludur.');
-      const status = ['draft', 'issued', 'cancelled'].includes(String(invoice.status)) ? String(invoice.status) : 'issued';
+      const status = invoice.status == null ? 'issued' : String(invoice.status);
+      if (!['draft', 'issued'].includes(status)) {
+        throw new OpError(400, 'Yeni fatura yalnızca taslak veya kesinleşmiş durumda oluşturulabilir; iptal için mevcut faturayı iptal edin.', 'INVALID_INVOICE_STATUS');
+      }
       if (!rawItems.length) throw new OpError(400, 'Fatura en az bir satır içermelidir.');
       const date = invoice.date ? new Date(invoice.date) : new Date();
       if (Number.isNaN(date.getTime())) throw new OpError(400, 'Geçersiz fatura tarihi.');
@@ -2697,10 +2802,12 @@ export function createBusinessOpsRouter(): { router: Router; deleteEffects: Dele
         // İrsaliye bağı: satır kilidi altında doğrula (çift faturalama, iptal,
         // cari/tip uyuşmazlığı). İrsaliye numarası istemciden değil DB'den alınır.
         let waybillNumber = invoice.waybillNumber ?? null;
-        if (waybillId && status !== 'draft') {
-          const wb = await lockWaybillForInvoice(conn, waybillId, { contactId, type });
-          waybillNumber = wb.waybillNumber;
+        let lockedWaybill: Awaited<ReturnType<typeof lockWaybillForInvoice>> | undefined;
+        if (waybillId) {
+          lockedWaybill = await lockWaybillForInvoice(conn, waybillId, { contactId, type, isStockDeducted });
+          waybillNumber = lockedWaybill.waybillNumber;
         }
+        if (status !== 'draft') await validateInvoiceLinks(conn, { orderId, waybillId, contactId, type }, items, lockedWaybill);
 
         const [invRes] = await conn.query(
           `INSERT INTO \`invoices\`
@@ -2795,11 +2902,21 @@ export function createBusinessOpsRouter(): { router: Router; deleteEffects: Dele
         const items = (itemRows[0] as any[]) || [];
         const grandTotal = Number(invoice.grandTotal) || 0;
 
-        if (invoice.orderId) await applyInvoiceOrderLink(conn, Number(invoice.orderId), items, grandTotal, 1);
+        let lockedWaybill: Awaited<ReturnType<typeof lockWaybillForInvoice>> | undefined;
         if (invoice.waybillId) {
           // Taslak oluşturulduktan sonra irsaliye başka bir faturaya bağlanmış
           // veya iptal edilmiş olabilir; bağlamadan önce kilit altında doğrula.
-          await lockWaybillForInvoice(conn, Number(invoice.waybillId), { contactId: Number(invoice.contactId), type: String(invoice.type) }, invoiceId);
+          lockedWaybill = await lockWaybillForInvoice(conn, Number(invoice.waybillId), {
+            contactId: Number(invoice.contactId), type: String(invoice.type), isStockDeducted: Number(invoice.isStockDeducted) === 1,
+          }, invoiceId);
+        }
+        await validateInvoiceLinks(conn, {
+          orderId: invoice.orderId == null ? null : Number(invoice.orderId),
+          waybillId: invoice.waybillId == null ? null : Number(invoice.waybillId),
+          contactId: Number(invoice.contactId), type: String(invoice.type),
+        }, items, lockedWaybill);
+        if (invoice.orderId) await applyInvoiceOrderLink(conn, Number(invoice.orderId), items, grandTotal, 1);
+        if (invoice.waybillId) {
           await conn.query("UPDATE `waybills` SET `invoicedStatus` = 'invoiced', `invoiceId` = ?, `invoiceNumber` = ?, `updatedAt` = NOW() WHERE `id` = ?", [invoiceId, invoice.invoiceNumber, Number(invoice.waybillId)]);
         }
 

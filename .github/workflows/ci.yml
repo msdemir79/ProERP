@@ -1,4 +1,4 @@
-name: ProERP checks
+name: DMR Nexus checks
 on: [push, pull_request]
 jobs:
   verify:
@@ -29,4 +29,8 @@ jobs:
       - run: npm run lint
       - run: npm test
       - run: npm run test:isolated
+      - run: npm run test:isolated -- src/tests/stockCountTests.ts
+      - run: npm run test:isolated -- src/tests/rbacTests.ts
+      - run: npm run test:isolated -- src/tests/reservationScanTests.ts
+      - run: npm run test:isolated -- src/tests/invoiceMatchTests.ts
       - run: npm run build

@@ -1,6 +1,6 @@
 /**
  * Accounts Receivable (AR) & Accounts Payable (AP) Aging Analysis
- * and Cash Flow Projection Service for ProERP
+ * and Cash Flow Projection Service for DMR Nexus
  */
 
 import { api } from '../api/client';

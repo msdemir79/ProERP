@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AlertCircle, Eye, EyeOff, Loader2, Lock, ShieldCheck, User } from 'lucide-react';
+import { AlertCircle, Eye, EyeOff, Loader2, Lock, User } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 /**
@@ -43,10 +43,14 @@ export default function LoginScreen() {
     <div className="min-h-screen flex items-center justify-center bg-slate-100 dark:bg-slate-950 p-4">
       <div className="w-full max-w-sm">
         <div className="flex flex-col items-center mb-6">
-          <div className="w-14 h-14 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-600/30">
-            <ShieldCheck className="w-7 h-7" />
+          <div className="w-full max-w-[280px] rounded-2xl bg-white p-2 shadow-lg shadow-slate-900/10">
+            <img
+              src="/brand/dmr-nexus-wordmark.png"
+              alt="DMR Nexus ERP"
+              className="w-full h-auto object-contain"
+            />
           </div>
-          <h1 className="mt-4 text-xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">ProERP</h1>
+          <h1 className="sr-only">DMR Nexus</h1>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
             Muhasebe, üretim ve stok yönetim sistemi
           </p>

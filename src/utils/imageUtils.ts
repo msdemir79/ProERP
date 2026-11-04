@@ -1,5 +1,5 @@
 /**
- * Image processing utilities for ProERP
+ * Image processing utilities for DMR Nexus
  * Automatically resizes, optimizes, and standardizes product and label images.
  */
 

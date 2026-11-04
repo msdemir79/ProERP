@@ -146,7 +146,7 @@ export default function DeletedRecordsTab() {
     ]);
 
     const dateStr = new Date().toISOString().slice(0, 10);
-    exportToCsv(`ProERP_Silinen_Kayitlar_${dateStr}.csv`, headers, rows);
+    exportToCsv(`DMR Nexus_Silinen_Kayitlar_${dateStr}.csv`, headers, rows);
   };
 
   return (

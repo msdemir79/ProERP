@@ -488,7 +488,7 @@ export default function ProductionRefakatKartiModal({
                     </div>
                     <div>
                       <h2 className="text-sm font-black tracking-wider uppercase text-slate-800">
-                        PRO-ERP AYAKKABI SANAYİ VE TİCARET A.Ş.
+                        DMR NEXUS
                       </h2>
                       <p className="text-[10px] text-slate-600 font-semibold">
                         Ayakkabı İmalat & Üretim Takip Bandı Sistemi
@@ -739,7 +739,7 @@ export default function ProductionRefakatKartiModal({
 
             {/* Footer Notice */}
             <div className="border-t border-slate-300 pt-2 flex items-center justify-between text-[9px] text-slate-500 font-medium">
-              <span>ProERP Ayakkabı İmalat Takip Modülü • Belge No: REF-{workOrder.barcode}</span>
+              <span>DMR Nexus Ayakkabı İmalat Takip Modülü • Belge No: REF-{workOrder.barcode}</span>
               <span>Baskı Tarihi: {new Date().toLocaleString('tr-TR')}</span>
             </div>
           </div>

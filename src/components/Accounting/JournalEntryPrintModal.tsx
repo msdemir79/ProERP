@@ -124,7 +124,7 @@ export default function JournalEntryPrintModal({ entry, onClose }: Props) {
               ) : null}
               <div>
                 <h1 className="text-lg font-black text-gray-900 uppercase">
-                  {companySettings?.companyTitle || companySettings?.companyName || 'PRO ERP AYAKKABI VE DERİ MAMULLERİ SAN. TİC. LTD. ŞTİ.'}
+                  {companySettings?.companyTitle || companySettings?.companyName || 'DMR Nexus'}
                 </h1>
                 <p className="text-xs text-gray-600 mt-0.5">{companySettings?.address || 'İkitelli OSB Aykosan Sanayi Sitesi Başakşehir / İstanbul'}</p>
                 <p className="text-xs text-gray-600">Vergi Dairesi: {companySettings?.taxOffice || 'İkitelli V.D.'} - {companySettings?.taxNumber || '7320491820'}</p>
