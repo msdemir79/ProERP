@@ -1,0 +1,272 @@
+<div class="lans">
+<style>
+  .lans{
+    --bg:#070a11; --surface:#111a2b; --line:rgba(148,163,184,.16); --line2:rgba(148,163,184,.3);
+    --fg:#e8eefb; --dim:#b6c2d9; --mut:#8fa0bd; --c1:#22d3ee; --c2:#6366f1; --c3:#a855f7;
+    --ok:#34d399; --warn:#fbbf24; --bad:#fb7185;
+    --grad:linear-gradient(100deg,var(--c1),var(--c2) 55%,var(--c3));
+    color:var(--fg); font:15px/1.55 "Inter","Segoe UI",system-ui,Arial,sans-serif; letter-spacing:.01em;
+    background:radial-gradient(1200px 620px at 12% -10%,rgba(34,211,238,.16),transparent 60%),
+               radial-gradient(1100px 600px at 88% 2%,rgba(168,85,247,.16),transparent 62%),var(--bg);
+  }
+  .lans *{box-sizing:border-box;margin:0;padding:0}
+  .lans a{color:inherit;text-decoration:none}
+  .lans .wrap{max-width:1320px;margin:0 auto;padding:0 30px}
+  .lans .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:11px;font-weight:650;font-size:13.5px;
+    border:1px solid var(--line2);color:var(--fg);background:rgba(255,255,255,.04);cursor:pointer}
+  .lans .btn:hover{border-color:rgba(34,211,238,.55)}
+  .lans .btn.pri{background:var(--grad);color:#051018;border:none;box-shadow:0 10px 30px rgba(59,130,246,.34)}
+  .lans .btn.lg{padding:14px 22px;font-size:14.5px;border-radius:13px}
+
+  .lans nav{position:sticky;top:0;z-index:20;backdrop-filter:blur(14px);background:rgba(7,10,17,.74);border-bottom:1px solid var(--line)}
+  .lans .nav{display:flex;align-items:center;gap:24px;height:66px}
+  .lans .brand{display:flex;align-items:center;gap:11px;font-weight:750;letter-spacing:.14em;font-size:13px}
+  .lans .mark{width:30px;height:30px;border-radius:9px;background:var(--grad);display:grid;place-items:center;color:#04121c;font-weight:900;font-size:12px}
+  .lans .nlk{display:flex;gap:20px;font-size:13.5px;color:var(--dim);margin-left:14px}
+  .lans .nlk b{color:#fff;font-weight:700}
+  .lans .ncta{margin-left:auto;display:flex;gap:10px}
+
+  .lans .hero{display:grid;grid-template-columns:1.02fr .98fr;gap:52px;align-items:center;padding:68px 0 54px}
+  .lans .eyebrow{display:inline-flex;align-items:center;gap:9px;font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--c1);
+    background:rgba(34,211,238,.09);border:1px solid rgba(34,211,238,.3);padding:7px 13px;border-radius:999px}
+  .lans h1{font-size:50px;line-height:1.08;font-weight:800;margin:20px 0 16px;letter-spacing:-.02em}
+  .lans h1 em{font-style:normal;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lans .lead{font-size:16.5px;color:var(--dim);max-width:560px}
+  .lans .row{display:flex;gap:12px;margin:28px 0 24px;flex-wrap:wrap}
+  .lans .trust{display:flex;gap:28px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:20px}
+  .lans .trust div{min-width:110px}
+  .lans .trust b{display:block;font-size:23px;font-weight:800;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lans .trust span{font-size:12.5px;color:var(--mut)}
+
+  .lans .screen{border:1px solid var(--line2);border-radius:20px;overflow:hidden;
+    background:linear-gradient(180deg,rgba(22,33,58,.96),rgba(11,17,32,.98));
+    box-shadow:0 40px 90px rgba(2,6,23,.75),inset 0 1px 0 rgba(255,255,255,.06)}
+  .lans .chrome{display:flex;align-items:center;gap:8px;padding:11px 15px;background:rgba(255,255,255,.03);border-bottom:1px solid var(--line)}
+  .lans .dot{width:10px;height:10px;border-radius:50%;background:#3b4a66}
+  .lans .dot:nth-child(1){background:var(--bad)}.lans .dot:nth-child(2){background:var(--warn)}.lans .dot:nth-child(3){background:var(--ok)}
+  .lans .addr{margin-left:10px;font-size:11.5px;color:var(--mut);background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:8px;padding:4px 12px}
+  .lans .sb{padding:16px}
+  .lans .sh{display:flex;align-items:center;gap:11px;margin-bottom:14px;flex-wrap:wrap}
+  .lans .sh h4{font-size:15.5px;font-weight:750}
+  .lans .live{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--ok);background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.3);border-radius:999px;padding:4px 11px}
+  .lans .pulse{width:7px;height:7px;border-radius:50%;background:var(--ok);animation:pul 1.9s infinite}
+  @keyframes pul{0%{box-shadow:0 0 0 0 rgba(52,211,153,.5)}70%{box-shadow:0 0 0 9px rgba(52,211,153,0)}100%{box-shadow:0 0 0 0 rgba(52,211,153,0)}}
+  .lans .seg{margin-left:auto;display:flex;background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:9px;padding:3px;font-size:11.5px}
+  .lans .seg span{padding:5px 11px;border-radius:7px;color:var(--mut)}
+  .lans .seg span.on{background:var(--grad);color:#051018;font-weight:700}
+
+  .lans .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
+  .lans .kpi{background:rgba(255,255,255,.035);border:1px solid var(--line);border-radius:13px;padding:11px 12px}
+  .lans .kpi small{display:block;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)}
+  .lans .kpi b{display:block;font-size:19px;font-weight:800;margin:5px 0 2px;font-variant-numeric:tabular-nums}
+  .lans .kpi i{font-style:normal;font-size:11px}
+  .lans .up i{color:var(--ok)}.lans .down i{color:var(--bad)}.lans .flat i{color:var(--warn)}
+
+  .lans .grid{display:grid;grid-template-columns:1.6fr 1fr;gap:12px}
+  .lans .card{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:14px;padding:12px}
+  .lans .card h5{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-bottom:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .lans .chip{font-size:10.5px;padding:2px 9px;border-radius:999px;background:rgba(99,102,241,.16);border:1px solid rgba(99,102,241,.4);color:#c7d2fe;text-transform:none;letter-spacing:0}
+  .lans table{width:100%;border-collapse:collapse;font-size:12px}
+  .lans th{text-align:left;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);font-weight:650;padding:0 8px 8px;border-bottom:1px solid var(--line)}
+  .lans td{padding:8px;border-bottom:1px solid rgba(148,163,184,.08);color:var(--dim);white-space:nowrap;font-variant-numeric:tabular-nums}
+  .lans tr:last-child td{border-bottom:none}
+  .lans td.nm{color:var(--fg);font-weight:600}
+  .lans .sw{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:7px;vertical-align:-1px}
+  .lans .pill{font-size:10.5px;padding:3px 9px;border-radius:999px;font-weight:700}
+  .lans .p-ok{background:rgba(52,211,153,.14);color:#6ee7b7;border:1px solid rgba(52,211,153,.35)}
+  .lans .p-warn{background:rgba(251,191,36,.14);color:#fcd34d;border:1px solid rgba(251,191,36,.35)}
+  .lans .p-bad{background:rgba(251,113,133,.14);color:#fda4af;border:1px solid rgba(251,113,133,.35)}
+  .lans .mini{display:flex;align-items:flex-end;gap:7px;height:72px;margin:4px 0 8px}
+  .lans .mini div{flex:1;border-radius:6px 6px 3px 3px;background:linear-gradient(180deg,var(--c1),rgba(99,102,241,.35))}
+  .lans .mini div:nth-child(even){background:linear-gradient(180deg,var(--c3),rgba(99,102,241,.3))}
+  .lans .lg{display:flex;justify-content:space-between;font-size:10px;color:var(--mut)}
+  .lans ul{list-style:none;display:grid;gap:9px}
+  .lans li{display:flex;align-items:center;gap:9px;font-size:12px;color:var(--dim)}
+  .lans li b{margin-left:auto;color:var(--fg)}
+  .lans .ic{width:22px;height:22px;border-radius:7px;display:grid;place-items:center;font-size:11px;font-weight:800;flex:0 0 auto}
+  .lans .sfoot{display:flex;align-items:center;gap:10px;margin-top:12px;padding-top:11px;border-top:1px solid var(--line);font-size:11px;color:var(--mut)}
+
+  .lans .band{padding:24px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:rgba(255,255,255,.022)}
+  .lans .logos{display:flex;gap:11px;flex-wrap:wrap;justify-content:center;font-size:12.5px;color:var(--mut)}
+  .lans .logos span{border:1px solid var(--line);border-radius:10px;padding:8px 15px;background:rgba(255,255,255,.03);letter-spacing:.05em}
+
+  .lans section{padding:66px 0}
+  .lans .h2{font-size:33px;font-weight:800;letter-spacing:-.015em;line-height:1.16}
+  .lans .sub{color:var(--dim);font-size:15.5px;margin-top:12px;max-width:660px}
+  .lans .fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:17px;margin-top:34px}
+  .lans .f{border:1px solid var(--line);border-radius:16px;padding:21px;background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.015))}
+  .lans .f:hover{border-color:rgba(34,211,238,.45)}
+  .lans .f .ic{width:38px;height:38px;border-radius:11px;font-size:16px;margin-bottom:13px;background:var(--grad);color:#051018}
+  .lans .f h3{font-size:16.5px;font-weight:730;margin-bottom:7px}
+  .lans .f p{font-size:13.5px;color:var(--dim)}
+  .lans .f ul{margin-top:12px;gap:7px}
+  .lans .f li{font-size:12.5px;color:var(--mut)}
+
+  .lans .split{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:start}
+  .lans .flow{display:grid;gap:11px;margin-top:24px}
+  .lans .step{display:flex;gap:13px;align-items:flex-start;border:1px solid var(--line);border-radius:13px;padding:14px 16px;background:rgba(255,255,255,.03)}
+  .lans .step .n{width:26px;height:26px;flex:0 0 auto;border-radius:9px;background:var(--grad);color:#051018;display:grid;place-items:center;font-weight:800;font-size:12px}
+  .lans .step b{display:block;font-size:14.5px;margin-bottom:3px}
+  .lans .step span{font-size:12.5px;color:var(--mut)}
+
+  .lans .mods{display:flex;gap:9px;flex-wrap:wrap;margin-top:26px}
+  .lans .mod{border:1px solid var(--line);background:rgba(255,255,255,.03);border-radius:999px;padding:9px 17px;font-size:13px;color:var(--dim)}
+  .lans .mod.on{background:var(--grad);color:#051018;font-weight:750;border-color:transparent}
+
+  .lans .sec{border:1px solid var(--line);border-radius:22px;padding:30px;background:linear-gradient(120deg,rgba(34,211,238,.08),rgba(168,85,247,.08))}
+  .lans .sec h3{font-size:18.5px;font-weight:760}
+  .lans .sec p{color:var(--dim);font-size:13.5px;margin-top:8px}
+  .lans .srow{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px}
+  .lans .srow div{border:1px solid var(--line);border-radius:13px;padding:14px;background:rgba(7,10,17,.45)}
+  .lans .srow b{display:block;font-size:14px;margin-bottom:5px}
+  .lans .srow span{font-size:12.5px;color:var(--mut)}
+
+  .lans .cta{text-align:center;padding:70px 0 22px}
+  .lans .cta h2{font-size:36px;font-weight:820;letter-spacing:-.02em}
+  .lans .cta .sub{margin:14px auto 24px;text-align:center}
+  .lans .cta .row{justify-content:center;margin:0}
+  .lans footer{border-top:1px solid var(--line);padding:24px 0 34px;color:var(--mut);font-size:12.5px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  .lans .note{font-size:11.5px;color:var(--mut);text-align:center;padding-bottom:18px}
+  @media (max-width:1040px){
+    .lans .hero,.lans .split{grid-template-columns:1fr;gap:34px}
+    .lans .fgrid{grid-template-columns:1fr 1fr}.lans h1{font-size:38px}.lans .nlk{display:none}
+  }
+</style>
+
+<nav>
+  <div class="wrap nav">
+    <div class="brand"><span class="mark">DN</span>DMR&nbsp;NEXUS</div>
+    <div class="nlk"><a>Ürünler</a><a><b>Stok</b></a><a>Üretim</a><a>Cari &amp; Finans</a><a>Muhasebe</a><a>İK</a><a>Fiyatlandırma</a></div>
+    <div class="ncta"><a class="btn">Giriş</a><a class="btn pri">Ücretsiz deneyin</a></div>
+  </div>
+</nav>
+
+<header class="wrap hero">
+  <div>
+    <span class="eyebrow">● Stok &amp; Depo Yönetimi</span>
+    <h1>Stoklarınız tek ekranda: <em>gerçek zamanlı, renk beden, hat bazlı.</em></h1>
+    <p class="lead">DMR NEXUS Stok; malzeme, yarı mamul ve mamul kartlarını tek havuzda toplar. Rezervasyon, sayım ve uzlaştırma akışları muhasebe ve üretimle aynı veritabanında, kilitli tek işlem olarak çalışır — farkı görürsünüz, sebebini de.</p>
+    <div class="row"><a class="btn pri lg">14 gün ücretsiz kurulum</a><a class="btn lg">Canlı demo izle ▸</a></div>
+    <div class="trust">
+      <div><b>%99,4</b><span>stok doğruluğu</span></div>
+      <div><b>2,1 sn</b><span>100 kalem sayım onayı</span></div>
+      <div><b>48</b><span>depo / raf eşiği</span></div>
+      <div><b>7/24</b><span>hareket denetim izi</span></div>
+    </div>
+  </div>
+
+  <div class="screen">
+    <div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="addr">nexus.app/tr/stok/pano</span></div>
+    <div class="sb">
+      <div class="sh">
+        <h4>Stok Panosu</h4>
+        <span class="live"><span class="pulse"></span>canlı · 14:32</span>
+        <div class="seg"><span class="on">Kartlar</span><span>Hareketler</span><span>Sayım</span><span>Uzlaştırma</span></div>
+      </div>
+
+      <div class="kpis">
+        <div class="kpi up"><small>Stok değeri</small><b>₺48,7M</b><i>▲ %3,1 bu ay</i></div>
+        <div class="kpi flat"><small>Kritik / eksik</small><b>17 kart</b><i>5 sipariş bekliyor</i></div>
+        <div class="kpi down"><small>Fazla stok</small><b>₺2,9M</b><i>140 gün bağlı sermaye</i></div>
+        <div class="kpi up"><small>Devir hızı</small><b>4,8×</b><i>yıllık · hedef 4,5×</i></div>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <h5>Öncelikli kartlar <span class="chip">filtre: kritik + bağlı rezervasyon</span></h5>
+          <table>
+            <thead><tr><th>Stok kartı</th><th>Renk / beden</th><th>Kayıtlı</th><th>Rezerve</th><th>Durum</th></tr></thead>
+            <tbody>
+              <tr><td class="nm"><span class="sw" style="background:#1f2937"></span>6049 Merdane Spor</td><td>Siyah · 41</td><td>124</td><td>140</td><td><span class="pill p-bad">Eksik 16</span></td></tr>
+              <tr><td class="nm"><span class="sw" style="background:#e11d48"></span>6102 Boston Klasik</td><td>Kırmızı · 39</td><td>820</td><td>310</td><td><span class="pill p-ok">Yeterli</span></td></tr>
+              <tr><td class="nm"><span class="sw" style="background:#0ea5e9"></span>157.03.002 Faylon Taban</td><td>—</td><td>3.410 m</td><td>2.980 m</td><td><span class="pill p-warn">Kritik</span></td></tr>
+              <tr><td class="nm"><span class="sw" style="background:#a16207"></span>7740 Hakiki Deri</td><td>Nubuk · 42</td><td>96 m</td><td>20 m</td><td><span class="pill p-ok">Yeterli</span></td></tr>
+              <tr><td class="nm"><span class="sw" style="background:#7c3aed"></span>Kalıp A-12 Taban</td><td>44</td><td>12</td><td>12</td><td><span class="pill p-warn">Rezerve</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div style="display:grid;gap:12px">
+          <div class="card">
+            <h5>Depo bazlı doluluk</h5>
+            <div class="mini"><div style="height:62%"></div><div style="height:88%"></div><div style="height:44%"></div><div style="height:72%"></div><div style="height:96%"></div><div style="height:38%"></div></div>
+            <div class="lg"><span>Merkez</span><span>Üretim</span><span>Bekleme</span><span>Fason</span><span>Sevkiyat</span><span>İade</span></div>
+          </div>
+          <div class="card">
+            <h5>Bugünkü hareketler</h5>
+            <ul>
+              <li><span class="ic" style="background:rgba(52,211,153,.16);color:#6ee7b7">▲</span>Mal kabul <b>312</b></li>
+              <li><span class="ic" style="background:rgba(251,113,133,.16);color:#fda4af">▼</span>Sevkiyat <b>1.084</b></li>
+              <li><span class="ic" style="background:rgba(34,211,238,.16);color:#67e8f9">↔</span>Raf transferi <b>46</b></li>
+              <li><span class="ic" style="background:rgba(251,191,36,.16);color:#fcd34d">✓</span>Sayım farkı <b>±18</b></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="sfoot"><span class="pill p-ok">Denetim izi aktif</span><span>Ekran tasarımı — veriler temsilîdir, canlı ERP verisi değildir.</span></div>
+    </div>
+  </div>
+</header>
+
+<div class="band">
+  <div class="wrap logos">
+    <span>MySQL 8.4 yerel veritabanı</span><span>Windows masaüstü .exe</span><span>Android / tablet</span><span>Tek noktada giriş</span><span>Türkçe mevzuat uyumlu</span>
+  </div>
+</div>
+
+<section class="wrap">
+  <h2 class="h2">Stok işini bölen onlarca pencere değil,<br>akışı gören tek pano.</h2>
+  <p class="sub">Kart, hareket, rezervasyon, sayım ve uzlaştırma aynı ekran setinde. Aşağıdaki her yetenek ERP çekirdeğiyle birlikte gelir; ayrı entegrasyon projesi gerekmez.</p>
+  <div class="fgrid">
+    <div class="f"><div class="ic">▦</div><h3>Renk &amp; beden kırılımı</h3><p>Asorti mantığıyla kart bazında değil, satış bazında görürsünüz. Toplam doğruyken yanlış beden kalmış olabilir.</p><ul><li>Varyant bazlı stok ve barkod</li><li>Koli / asorti boyu dönüşümü</li><li>Renk paleti ve katlamasız eşleşme</li></ul></div>
+    <div class="f"><div class="ic">◐</div><h3>Rezervasyon &amp; MRP</h3><p>Sipariş ve iş emrine bağlanan miktar fiziksel stoğu geçemez; fazla ayrılan satır gerekçesiyle listede durur.</p><ul><li>Aktif / serbest bakiye takibi</li><li>Sipariş kalanına göre tavan</li><li>Gerekçeli, yetkili serbest bırakma</li></ul></div>
+    <div class="f"><div class="ic">✓</div><h3>Sayım &amp; uzlaştırma</h3><p>1–100 ürünlük sayım taslağı stok değiştirmez; onay tek işlemde işler. Bir kalem bozulursa hiçbir şey yazılmaz.</p><ul><li>Sürüm kilidiyle çift kontrol</li><li>Farklar renk/bedene hareket yazılır</li><li>Kendi sayımını onaylama yasağı</li></ul></div>
+    <div class="f"><div class="ic">⤢</div><h3>Depo, raf, transfer</h3><p>Çok lokasyonlu stok defteri; raf transferi anlık maliyet ve erişilebilirlik etkisiyle kaydedilir.</p><ul><li>Doluluk ve kapasite ısı haritası</li><li>Bekleme / fason lokasyonları</li><li>Kapalı lokasyon ikazları</li></ul></div>
+    <div class="f"><div class="ic">⌁</div><h3>Kritik stok &amp; satın alma</h3><p>Eşik-altı kartlar tek tıkla satın alma talebine dönüşür; tedarik terminine göre gecikme tahmini üretilir.</p><ul><li>Min / max ve güvenlik stoğu</li><li>Tedarik süresi ağırlıklı öneri</li><li>Gelen sevkiyat takvimi</li></ul></div>
+    <div class="f"><div class="ic">⎙</div><h3>Toplu işlemler &amp; Excel</h3><p>Şablonla kart ve miktar import, toplu barkod üretimi; dışa aktarımda biçim birebir korunur.</p><ul><li>Parse öncesi doğrulama</li><li>Hata satırı raporu</li><li>100 / 200 kayıtlık sayfalama</li></ul></div>
+  </div>
+  <div class="mods">
+    <span class="mod on">Stok &amp; Depo</span><span class="mod">Üretim Kontrol Merkezi</span><span class="mod">Sipariş</span><span class="mod">İrsaliye &amp; Fatura</span><span class="mod">Cari</span><span class="mod">Çek &amp; Tahsilat</span><span class="mod">Muhasebe</span><span class="mod">İK &amp; Bordro</span><span class="mod">Kalıp Takip</span><span class="mod">Raporlar</span>
+  </div>
+</section>
+
+<section class="wrap" style="padding-top:14px">
+  <div class="split">
+    <div>
+      <h2 class="h2">Farkı görmek yetmez;<br>nedenini de gösterir.</h2>
+      <p class="sub">Her stok hareketi kim / ne zaman / hangi belge izini taşır. Sayım farkı, rezervasyon aşımı ve dönem kapama engelleri ekranda gerekçesiyle durur — veri avına çıkmazsınız.</p>
+      <div class="flow">
+        <div class="step"><span class="n">1</span><div><b>Kartı aç</b><span>Stok, rezervasyon, sipariş ve iş emri bakiyeleri tek panelde.</span></div></div>
+        <div class="step"><span class="n">2</span><div><b>Filtreyi uygula</b><span>Kritik + bağlı rezervasyon + aşımlar; sonuç anında daralır.</span></div></div>
+        <div class="step"><span class="n">3</span><div><b>Sayımı onayla</b><span>Yetkili kullanıcı, gerekçe, tek işlem — başarısız kalem bütün onayı geri alır.</span></div></div>
+        <div class="step"><span class="n">4</span><div><b>Raporu gönder</b><span>Excel / PDF dışa aktarım ve denetim listesi tek tıkla.</span></div></div>
+      </div>
+      <div class="row" style="margin-bottom:0"><a class="btn pri lg">Kurulum talep et</a><a class="btn lg">Modülleri karşılaştır</a></div>
+    </div>
+    <div class="sec">
+      <h3>Veri güvenliği ve kontrol</h3>
+      <p>Finansal ve stok kaynaklı alanlar yalnızca kendi iş akışından yazılır; genel düzenleme ekranı iş kurallarını atlayamaz.</p>
+      <div class="srow">
+        <div><b>Kademeli silme</b><span>Parola + gerekçe zorunlu, değiştirilemez denetim kaydı.</span></div>
+        <div><b>Optimistic lock</b><span>Eşzamanlı düzenlemede sessiz veri kaybı yok.</span></div>
+        <div><b>Dönem kilidi</b><span>Kapalı muhasebe döneminde sayım onayı yapılamaz.</span></div>
+        <div><b>Rol bazlı yetki</b><span>Görüntüleme / düzenleme / onay ayrı atanır.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="wrap cta">
+  <h2>Depoyu panoya bağlayın.</h2>
+  <p class="sub">Kurulumda mevcut kart listenizi içe aktarıyoruz; aynı gün kritik stok ve rezervasyon raporunuz elinizde.</p>
+  <div class="row"><a class="btn pri lg">Ücretsiz başla</a><a class="btn lg">Satış ekibini arayın</a></div>
+</section>
+
+<p class="note">Bu yalnızca bir tasarım görselidir: metin ve sayılar temsilîdir, ProERP/DMR Nexus koduna veya veritabanına dokunulmadı.</p>
+
+<footer class="wrap">
+  <span>© DMR NEXUS · Ayakkabı Üretim &amp; ERP</span>
+  <span>Stok · Üretim · Maliyet · Kalıp · Mobil</span>
+</footer>
+</div>
