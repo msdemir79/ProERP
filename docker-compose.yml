@@ -1,0 +1,70 @@
+# DMR Nexus - Docker Compose kurulumu
+#
+#   docker compose up -d --build      → uygulama + MySQL başlar
+#   http://localhost:3000             → giriş ekranı
+#   docker compose logs -f app        → ilk giriş parolaları burada yazılır
+#   docker compose down               → durdurur (veriler volume'larda kalır)
+#
+# Parolaları değiştirmek için proje kökünde .env dosyası oluşturun:
+#   DB_ROOT_PASSWORD=guclu-bir-root-parolasi
+#   DB_PASSWORD=guclu-bir-uygulama-parolasi
+#   APP_PORT=3000
+#   SEED_USER_PASSWORD=ilk-giris-parolasi   (boşsa rastgele üretilir)
+#
+# NOT: COOKIE_SECURE=false yalnızca düz HTTP (yerel/yerel ağ) içindir.
+#      HTTPS arkasında (ters vekil) true yapılmalıdır.
+
+services:
+  db:
+    image: mysql:8.4
+    restart: unless-stopped
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_turkish_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-proerp-root-change-me}
+      # Uygulama konteyneri root bağlantısıyla şemayı kurar (yalnızca compose ağı içinde).
+      MYSQL_ROOT_HOST: "%"
+    volumes:
+      - dbdata:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      HOST: 0.0.0.0
+      PORT: 3000
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_USER: proerp
+      DB_PASSWORD: ${DB_PASSWORD:-proerp-pass-change-me}
+      DB_NAME: proerp
+      DB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-proerp-root-change-me}
+      SEED_USER_PASSWORD: ${SEED_USER_PASSWORD:-}
+      SESSION_TTL_HOURS: ${SESSION_TTL_HOURS:-24}
+      COOKIE_SECURE: "false"
+      ALLOW_DESTRUCTIVE_OPS: ${ALLOW_DESTRUCTIVE_OPS:-false}
+      UPLOAD_DIR: /data/uploads
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    volumes:
+      - uploads:/data/uploads
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 90s
+
+volumes:
+  dbdata:
+  uploads:

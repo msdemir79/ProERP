@@ -37,7 +37,10 @@ const cfg = {
 };
 
 const argRootUser = process.argv.find((a) => a.startsWith('--root-user='))?.split('=')[1];
-const argRootPass = process.argv.find((a) => a.startsWith('--root-password='))?.split('=')[1];
+// Docker gibi etkileşimsiz ortamlarda root parolası DB_ROOT_PASSWORD ile verilebilir.
+const argRootPass =
+  process.argv.find((a) => a.startsWith('--root-password='))?.split('=')[1] ??
+  process.env.DB_ROOT_PASSWORD;
 
 async function askRootPassword() {
   if (argRootPass !== undefined) return argRootPass;

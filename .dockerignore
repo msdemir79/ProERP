@@ -1,0 +1,16 @@
+node_modules
+dist
+.git
+.github
+docs
+branding
+.env
+.env.*
+!.env.example
+data
+backups
+logs
+*.log
+Kur.cmd
+Baslat.cmd
+fix-service.cmd

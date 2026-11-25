@@ -18,6 +18,23 @@ Uygulamanın adı **DMR Nexus**. Giriş ekranındaki logo ve uygulama simgesi `p
 | **İK** | Personel özlük, puantaj, izin, bordro, avans |
 | **Yönetim** | Rol tabanlı yetkilendirme (RBAC), denetim kaydı (audit log), raporlar, ayarlar |
 
+## Ekran Görüntüleri
+
+Görseller, örnek (demo) verilerle çalışan uygulamadan alınmıştır; tamamı `docs/screenshots/` klasöründedir.
+
+| | |
+|---|---|
+| <img src="docs/screenshots/01-giris.png" width="480" alt="Giriş ekranı"> | <img src="docs/screenshots/02-kontrol-paneli.png" width="480" alt="Kontrol paneli"> |
+| **Giriş ekranı** | **Kontrol paneli** — nakit akışı, stok dağılımı, mali durum |
+| <img src="docs/screenshots/03-stok.png" width="480" alt="Stok yönetimi"> | <img src="docs/screenshots/04-uretim.png" width="480" alt="Üretim takibi"> |
+| **Stok & malzeme envanteri** — varyantlı kartlar, kritik stok | **Üretim planlama** — 8 kademeli hat görünümü, canlı izleme |
+| <img src="docs/screenshots/16-stok-raporu.png" width="480" alt="Stok özet raporu"> | <img src="docs/screenshots/10-finans.png" width="480" alt="Finans ve kasa"> |
+| **Stok özet raporu** — Excel'e aktarılabilir | **Finans** — kasa, banka, çek/senet portföyü |
+| <img src="docs/screenshots/11-ik.png" width="480" alt="İnsan kaynakları"> | <img src="docs/screenshots/14-kullanicilar.png" width="480" alt="Kullanıcı ve yetki yönetimi"> |
+| **İK & bordro** — personel, puantaj, izin, bordro | **Kullanıcı & yetki** — rol matrisi (RBAC), denetim izi |
+| <img src="docs/screenshots/12-raporlar.png" width="480" alt="Raporlar merkezi"> | <img src="docs/screenshots/15-ayarlar.png" width="480" alt="Ayarlar"> |
+| **Rapor & analiz merkezi** | **Ayarlar** — asorti/beden şablonları, barkod kuralları |
+
 ## Güvenlik
 
 - **Oturum açma zorunludur.** Tüm `/api/*` uçları (sağlık kontrolü ve `POST /api/auth/login` hariç) geçerli bir oturum ister. Yetkilendirme istemcide değil **sunucuda** uygulanır: her istek, kaynağın bağlı olduğu modülün RBAC izniyle denetlenir (`server/auth.ts`, `server/registry.ts`, `server/api.ts`).
@@ -32,6 +49,48 @@ Uygulamanın adı **DMR Nexus**. Giriş ekranındaki logo ve uygulama simgesi `p
 - **Sunucu varsayılan olarak yalnızca `127.0.0.1` dinler.** Yerel ağa açmak için `.env` içinde `HOST=0.0.0.0` ayarlanır.
 
 ## Kurulum
+
+Üç kurulum yolu vardır; ayrıntılar aşağıdaki bölümlerde.
+
+| Yöntem | Kime uygun | Gereksinim | Kurulum | Sonraki açılış |
+|---|---|---|---|---|
+| **Windows tek tık** (`Kur.cmd`) | Windows'ta, komut satırı bilmeden yerel kullanım | Windows 10/11; Node.js 20+ (yoksa betik `winget` ile kurmayı teklif eder); MySQL 8 çalışıyor olmalı | `Kur.cmd` dosyasına çift tıkla → MySQL root parolasını gir | Masaüstündeki **DMR Nexus** kısayolu |
+| **Docker Compose** | Node.js/MySQL kurmak istemeyenler; en hızlı ve tekrarlanabilir kurulum | Docker Desktop (Compose v2) | `docker compose up -d --build` | `docker compose up -d` |
+| **Manuel** (`npm`) | Geliştirme, özelleştirme ve sunucu kurulumu | Node.js 20+, MySQL 8.0+ | `npm install` → `npm run db:setup` → `npm run dev` | `npm run dev` (üretimde `npm run build` + `npm start`) |
+
+### Tek tık kurulum (Windows)
+
+Teknik bilgi gerektirmeyen en kolay yol:
+
+1. **Ön koşul:** Node.js 20+ ve MySQL 8.0+ aynı makinede kurulu olmalı; MySQL servisi çalışıyor olmalıdır.
+2. Projeyi indirin (ZIP) veya `git clone` ile alın.
+3. `Kur.cmd` dosyasına **çift tıklayın** (yönetici yetkisi gerekmez).
+4. Sorulduğunda MySQL **root** parolasını yazın (ekranda görünmez).
+5. Kurulum bitince tarayıcı `http://127.0.0.1:3000` adresinde açılır; masaüstüne **DMR Nexus** kısayolu eklenir.
+
+`Kur.cmd` sırasıyla: Node.js/MySQL kontrolü → `npm install` → `.env` oluşturma (rastgele veritabanı parolası) → `npm run db:setup` → `npm run build` → ilk başlatma + kısayol. Node.js yoksa betik `winget` üzerinden kurmayı teklif eder; MySQL'in kurulu olması gerekir (bağlantı yoksa betik indirme adresini gösterip durur).
+
+> İlk açılışta kullanıcı giriş parolaları **yalnızca bir kez** sunucu penceresine yazılır; kaydetmeyi unutmayın. İndirilen ZIP'ten çıkarılan `.cmd` dosyaları için Windows "Yine de çalıştır" uyarısı gösterebilir.
+
+Sonraki açılışlar için masaüstündeki **DMR Nexus** kısayolunu kullanın (arka planda `Baslat.cmd` çalışır, uygulama gizli başlar ve tarayıcı açılır; günlükler `logs/app.log`). Uygulamayı durdurmak için Görev Yöneticisi'nden `node` sürecini kapatın. Başka bir cihazdan (yerel ağ) erişmek için `.env` içinde `HOST=0.0.0.0` ve `COOKIE_SECURE=false` yapıp sunucuyu yeniden başlatın; yalnızca güvenilir ağda kullanın.
+
+### Docker ile kurulum (tek komut)
+
+Docker (Desktop veya Engine) + Compose v2 yeterlidir; Node.js veya MySQL kurulumu gerekmez.
+
+```bash
+docker compose up -d --build
+```
+
+Uygulama `http://localhost:3000` adresinde açılır. İlk açılışta veritabanı şeması otomatik kurulur, örnek veriler yüklenir ve kullanıcı parolaları **yalnızca bir kez** `docker compose logs -f app` çıktısına yazılır (sabit parola için `.env` içine `SEED_USER_PASSWORD=...` ekleyin). Mevcut bir veritabanıyla yeniden başlatıldığında yalnızca yeni migration'lar uygulanır.
+
+- **Parolalar:** Varsayılan DB parolaları yalnızca yerel kullanım içindir. Proje kökünde `.env` dosyasına `DB_ROOT_PASSWORD=...`, `DB_PASSWORD=...` ve isteğe bağlı `APP_PORT=3001` yazın; `docker compose` bu değerleri otomatik okur. Parolaları **ilk `up` öncesi** belirleyin: ilk kurulumdan sonra değiştirirseniz MySQL'deki kullanıcı parolası eski kalır ve uygulama bağlanamaz (`docker compose down -v` verileri silerek sıfırlar).
+- **Veriler:** MySQL verisi `dbdata`, görseller `uploads` volume'unda kalır. `docker compose down` durdurur; `docker compose down -v` **verileri siler**.
+- **Güncelleme:** `git pull` sonrası `docker compose up -d --build`; şema geçişleri otomatik uygulanır.
+- **Yedek:** `docker compose exec db sh -c 'mysqldump -uroot -p"$MYSQL_ROOT_PASSWORD" --single-transaction proerp' > yedek.sql` ve görseller için `docker compose cp app:/data/uploads ./uploads-yedek`.
+- **Ağ / güvenlik:** Port tüm arayüzlere açılır (`HOST=0.0.0.0`); yalnızca güvenilir ağda kullanın. HTTPS arkasında `docker-compose.yml` içindeki `COOKIE_SECURE` değerini `"true"` yapın.
+
+### Manuel kurulum
 
 **Gereksinimler:** Node.js 20+, MySQL 8.0+
 
@@ -159,6 +218,8 @@ Geri yükleme için yukarıdaki [Geri dönüş (restore)](#üretim-dağıtım-de
 | `npm run seed:users` | Eksik rol kullanıcılarını eklemeli açar (`--apply` ile yazar; var olan kullanıcıya dokunmaz) |
 | `npm run build` | Üretim derlemesi (`dist/`) |
 | `npm start` | Derlenmiş uygulamayı çalıştırır |
+| `docker compose up -d --build` | Docker ile uygulama + MySQL başlatır (`http://localhost:3000`) |
+| `docker compose down` | Docker kurulumunu durdurur (volume'lar korunur) |
 | `npm run lint` | TypeScript tip kontrolü (`tsc --noEmit`) |
 | `npm test` | Birim testleri (bordro, maliyet, muhasebe doğrulayıcı) |
 | `npm run test:integration` | API + eşzamanlılık + silme kapısı entegrasyon testleri (canlı DB) |
